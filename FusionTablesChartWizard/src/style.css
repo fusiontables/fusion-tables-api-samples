@@ -1,0 +1,70 @@
+p.intro {
+  width: 800px;
+}
+h2 {
+  background: #C0C0FF;
+  margin-top: 10px;
+  margin-bottom: 0px;
+  cursor: pointer;
+  padding: 1px 3px;
+  width: 800px;
+}
+h3.required {
+  background: #C0C0FF;
+  margin-top: 10px;
+  margin-bottom: 0px;
+  cursor: pointer;
+  padding: 1px 3px;
+  width: 800px;
+}
+h3.output {
+  background: #A0A0E0;
+  margin-top: 10px;
+  margin-bottom: 0px;
+  cursor: pointer;
+  padding: 1px 3px;
+  width: 800px;
+}
+h4.option {
+  background: #E0E0E0;
+  margin-top: 10px;
+  margin-bottom: 0px;
+  cursor: pointer;
+  padding: 1px 3px;
+  width: 800px;
+}
+input[type='button'].config {
+  width: 150px;
+  height: 45px;
+  font-size: 100%;
+  font-weight: bold;
+}
+img {
+  width: 19px;
+  height: 16px;
+}
+textarea {
+  font-size: 12px;
+}
+textarea.colList {
+  background-color:#F0F0F0;
+  vertical-align:text-bottom;
+}
+textarea#chartiframe {
+  width:800px;
+  height:120px;
+}
+textarea#chartURL {
+  width:800px;
+  height:100px;
+}
+textarea#htmlCode {
+  width:800px;
+  height:600px;
+}
+.goog-zippy-expanded img {
+  background-image: url('images/minus.png');
+}
+.goog-zippy-collapsed img {
+  background-image: url('images/plus.png');
+}

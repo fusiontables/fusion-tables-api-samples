@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<!--
+  Copyright (c) 2011 Google Inc.
+-->
+<html>
+
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+
+    <title>FusionTables Chart Wizard</title>
+
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript"> 
+      google.load('visualization', '1', {packages: ['charteditor']});
+    </script>
+
+    <script type="text/javascript" src="../closure-library/closure/goog/base.js">
+    </script>
+    <script type="text/javascript" src="ftchartconfig.js"></script>
+    <!--
+    <script type="text/javascript" src="ftchartconfig_compiled.js"></script>
+    -->
+
+    <script type="text/javascript">
+       var ftchartWiz = new ftchartconfig( 
+         500, 300, "https://www.google.com/fusiontables");
+    </script>
+    <link rel="stylesheet" href="style.css" type="text/css"></link>
+  </head>
+
+  <body>
+    <h1>Fusion Tables Chart Wizard</h1>
+
+    <p class="intro">
+      This wizard helps you create the HTML or URL to embed a chart based on 
+      data in a Fusion Table in another web page.
+    </p>
+    <p class="intro">
+      First specify the docid of a Fusion Table with data you
+      would like to chart. The column picker drop down will allow you to 
+      select which columns contain the data for the chart.
+      By default only the first 100 rows will be fetched and you
+      can then configure a chart to visualize these rows. In the Basic Options
+      section you can change the row limit as well as
+      filter and sort the rows. The Advanced Options section allows for more
+      complex customization of the data used for the chart.
+      After creating your chart, you have three alternatives to include the
+      chart in your own web pages: use the iframe, use the URL provided in
+      your own code or use the HTML provided to create your own pages.
+    </p>
+    <p class="intro"> 
+      Please report problems or feature requests in the 
+      <a href="http://code.google.com/p/fusion-tables-api-samples/issues/list">
+      Issue Tracker</a>
+    </p>
+    
+    <div id="form-div">
+      <h3 class="required">Requires docid of Fusion Table and list of columns
+      </h3> 
+      <p class="note">
+        The table needs to be <b>public or unlisted and exportable</b>.
+      </p>
+      <div class="form-element">
+        <label for="tableid">Your Table docid:</label>
+        <input
+          type="text" 
+          id="tableid" 
+          class="right" 
+          maxlength="40" size="50" 
+          onchange="ftchartWiz.fetchColumns()"/>
+      </div>
+      <br/>
+      <div class="form-element">
+        List of selected columns: 
+        <textarea 
+          id="selectedColumns" 
+          class="colList"  
+          cols="80" rows="1"  
+          readonly="true">
+        </textarea><br/>
+        Select column from 
+        <select 
+          id="selectColumns" 
+          class="right" 
+          disabled="disabled" 
+          onchange="ftchartWiz.addremoveColumn()" >
+          <option value="">
+            --Select--
+          </option>
+        </select>
+        to add or remove from above list of selected columns        
+      </div>
+
+      <h4 id="header1" class="option"><img src="images/blank.gif"/>
+        Basic Options (filter, sort and limit number of rows)
+      </h4>
+      <div id="content1">
+        <br/>
+      	<div class="form-element">
+      	  <label for="filter">Filter: WHERE</label>
+      	  <input 
+            type="text" 
+            id="filter" 
+            size="50" 
+            onchange="ftchartWiz.updateChart()"/>
+      	</div>
+      	<div class="form-element">
+      	  <label for="limit">Row LIMIT: </label>
+      	  <input 
+            type="number" 
+            id="limit" 
+            size="4" value="100" 
+            onchange="ftchartWiz.updateChart()"/>
+      	</div>
+        <br/>
+      	<div class="form-element">
+      	  <label for="orderbyColumn">Order by column:</label>
+      	  <select 
+            id="orderbyColumn" 
+            class="right" 
+            disabled="disabled" 
+            onchange="ftchartWiz.updateChart()">
+      	    <option value="">
+      	      --Select--
+      	    </option>
+      	  </select>
+      	  <input 
+            type="radio" 
+            name="sortorder"
+            value="ASC"
+            checked="checked"
+            onchange="ftchartWiz.updateChart()">
+          Ascending
+          </input>
+      	  <input
+            type="radio" 
+            name="sortorder" 
+            value="DESC" 
+            id="sortdesc" 
+            onchange="ftchartWiz.updateChart()">
+          Descending
+          </input>
+      	</div>
+      </div>
+      <h4 id="header2" class="option"><img src="images/blank.gif"/>
+        Advanced Options (summarize groups of rows, change formatting and
+        column names)
+      </h4>
+      <div id="content2">
+        <br/>
+      	<div class="form-element">
+      	  <label for="groupbyColumn">Column to group rows by:</label>
+      	  <select id="groupbyColumn" class="right" disabled="disabled">
+      	    <option value="">
+      	      --Select--
+      	    </option>
+      	  </select>
+      	</div>
+      	<div class="form-element">
+          choose how to summarize the values:
+      	  <input type="radio" name="sumtype" value="sum" checked="checked">
+          sum</input>
+      	  <input type="radio" name="sumtype" value="average" >average</input>
+      	  <input type="radio" name="sumtype" value="min" >min</input>
+      	  <input type="radio" name="sumtype" value="max" >max</input>
+      	  <input type="radio" name="sumtype" value="count" >count</input>
+          <br/>
+      	  <label for="sumbyColumn">Choose Column with values to summarize:
+          </label>
+      	  <select 
+            id="sumbyColumn" 
+            class="right" 
+            disabled="disabled" 
+            onchange="ftchartWiz.addsummaryColumn()">
+      	    <option value="">
+      	      --Select--
+      	    </option>
+      	  </select>
+      	</div>
+        <br/>
+        <div class="form-element">
+          <label> Change formatting of data used for Chart</label><br/>
+          List of columns with formats: 
+          <textarea
+             id="formattedColumns" 
+             cols="80" rows="1" 
+             class="colList" 
+             readonly="true">
+          </textarea><br/>
+          Apply this format (see 
+          <a href="http://code.google.com/apis/chart/interactive/docs/reference.html#formatters">format patterns</a>) 
+          <input type="text" id="columnformat" size="10"/> to this column
+          <select 
+            id="selectformatColumns" 
+            class="right" 
+            disabled="disabled" 
+            onchange="ftchartWiz.addformattoColumn()" >
+            <option value="">
+              --Select--
+            </option>
+          </select>
+          <br/>
+          H-axis format: 
+          <input
+            type="text" id="haxisformat" 
+            size="10" onchange="ftchartWiz.updateChart()"/>
+          V-axis format: 
+          <input
+            type="text" id="vaxisformat" size="10"
+            onchange="ftchartWiz.updateChart()"/> 
+        </div>
+        <br/>
+        <div class="form-element">
+          <label> Rename column for use in Chart</label><br/>
+          Rename this column
+          <select 
+           id="selectrenameColumns" 
+           class="right" disabled="disabled" 
+           onchange="ftchartWiz.addnametoColumn()" >
+            <option value="">
+              --Select--
+            </option>
+          </select>
+          as <input type="text" id="columnrename" size="20"/>
+          (to undo, rename with a blank name)
+          <br/>
+        </div>
+      </div>
+      <br/>
+      <input
+        type="button" 
+        id="ConfigureChart" 
+        value="Configure Chart" 
+        class="config" onclick="ftchartWiz.openEditor()"/>
+      <br/>
+      <br/>
+      <div class="form-element">
+        <div class="right">
+          <label for="chartwidth">Optional Chart Dimensions: W:</label> 
+          <input 
+            type="text" 
+            id="chartwidth" 
+            class="short-input" 
+            value="500" 
+            onchange="ftchartWiz.updateChart()"> px,
+          <label for="chartheight">H:</label> 
+          <input
+            type="text" 
+            id="chartheight" 
+            class="short-input" value="400"
+            onchange="ftchartWiz.updateChart()"> px
+        </div>
+      </div>
+      <br/>
+      <div id='visualization'></div> 
+
+      <h3 id="headeriframe" class="output">
+        <img src="images/blank.gif"/>Your iframe
+      </h3>
+      <textarea id="chartiframe"></textarea>
+      <h3 id="headerURL" class="output">
+        <img src="images/blank.gif"/>Your URL
+      </h3>
+      <textarea id="chartURL"></textarea>
+      <h3 id="headerHTML" class="output">
+        <img src="images/blank.gif"/>Your HTML
+      </h3>
+      <textarea id="htmlCode"></textarea>
+
+    <script type="text/javascript">
+      ftchartWiz.createZips();
+    </script>
+  </body>
+
+</html>
