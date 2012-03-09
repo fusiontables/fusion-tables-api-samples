@@ -46,9 +46,10 @@ img {
 textarea {
   font-size: 12px;
 }
-textarea.colList {
+div.colList {
   background-color:#F0F0F0;
   vertical-align:text-bottom;
+  width:800px;
 }
 textarea#chartiframe {
   width:800px;

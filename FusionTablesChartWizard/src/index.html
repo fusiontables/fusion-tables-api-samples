@@ -73,12 +73,10 @@
       <br/>
       <div class="form-element">
         List of selected columns: 
-        <textarea 
+        <div 
           id="selectedColumns" 
-          class="colList"  
-          cols="80" rows="1"  
-          readonly="true">
-        </textarea><br/>
+          class="colList"> 
+        </div><br/>
         Select column from 
         <select 
           id="selectColumns" 
@@ -182,12 +180,10 @@
         <div class="form-element">
           <label> Change formatting of data used for Chart</label><br/>
           List of columns with formats: 
-          <textarea
+          <div
              id="formattedColumns" 
-             cols="80" rows="1" 
-             class="colList" 
-             readonly="true">
-          </textarea><br/>
+             class="colList">
+          </div><br/>
           Apply this format (see 
           <a href="http://code.google.com/apis/chart/interactive/docs/reference.html#formatters">format patterns</a>) 
           <input type="text" id="columnformat" size="10"/> to this column

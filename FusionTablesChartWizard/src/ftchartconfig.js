@@ -22,8 +22,6 @@ ftchartconfig = function( width, height, baseUrl) {
     selectformatColumns:'all',
     selectrenameColumns:'all'};
   this.textareaIds_ = {
-    selectedColumns:1, 
-    formattedColumns:1, 
     chartiframe:1, 
     chartURL:1, 
     htmlCode:1};
@@ -31,15 +29,15 @@ ftchartconfig = function( width, height, baseUrl) {
 
   this.colList_ = {};
   this.colType_ = {};
-
-  this.wrapper_;
-  this.cwidth_;
-  this.cheight_;
-  this.hformat_;
-  this.vformat_;
-  this.dataSourceUrl_;
-  this.data_;
-  this.editor_;
+  this.selectText_ = "";
+  this.wrapper_ = {}; 
+  this.cwidth_ = 0;
+  this.cheight_ = 0;
+  this.hformat_ = "";
+  this.vformat_ = "";
+  this.dataSourceUrl_ = "";
+  this.data_ = {};
+  this.editor_ = {};
   this.zips_=[];
 }
 
@@ -59,7 +57,7 @@ ftchartconfig.prototype.configureWrapper = function() {
 }
 
 ftchartconfig.prototype.openEditor = function() {
-  if (!(this.wrapper_)) {
+  if (Object.keys(this.wrapper_).length===0) {
     this.dataSourceUrl_ = this.ftBaseUrl_ + '/gvizdata?tq=';
     this.wrapper_ = new google.visualization.ChartWrapper({
       containerId: 'visualization',
@@ -97,7 +95,7 @@ ftchartconfig.prototype.openEditor = function() {
 
 // external function to update size of chart if wrapper exists
 ftchartconfig.prototype.updateChart = function() {
-  if (this.wrapper_) this.redrawChart();
+    if (Object.keys(this.wrapper_).length > 0) this.redrawChart();
 }
   
 // redraw chart
@@ -149,8 +147,6 @@ ftchartconfig.prototype.formatData = function() {
 
 // build FusionTables query
 ftchartconfig.prototype.buildQuery = function() {
-  var select_text = document.getElementById('selectedColumns').value;
-
   var ftquery;
   var groupby_col = document.getElementById('groupbyColumn').value;
   var orderby_col = document.getElementById('orderbyColumn').value;
@@ -162,7 +158,7 @@ ftchartconfig.prototype.buildQuery = function() {
                 "', " + sumtype + "('" + sumby_col + "')" + 
                 ' from ' + document.getElementById('tableid').value;
   } else {
-    ftquery = 'select ' + select_text + ' from ' + 
+    ftquery = 'select ' + this.selectText_ + ' from ' + 
               document.getElementById('tableid').value;
   }
 
@@ -369,6 +365,8 @@ ftchartconfig.prototype.fetchColumns = function() {
   }
 
   // clear all areas
+  document.getElementById( 'selectedColumns').innerHTML = "";
+  document.getElementById( 'formattedColumns').innerHTML = "";
   for (var textid in this.textareaIds_)
     document.getElementById( textid).value = "";
 
@@ -513,27 +511,27 @@ ftchartconfig.prototype.updateformatText = function() {
                     colx + "':{'format': '" + col.format + "'}";
     }
   }
-  document.getElementById("formattedColumns").value = format_text; 
+  document.getElementById("formattedColumns").innerHTML = format_text; 
 }
 
 ftchartconfig.prototype.updateSelectText = function() {
-  var select_text = "";
+  this.selectText_ = "";
   // build select text
   for (colx in this.colList_) { 
     var col = this.colList_[colx];
     var pre_sep = "";
-    if (select_text)
+    if (this.selectText_)
       pre_sep = ", ";
      
     if (col.sum) {
-      select_text = select_text + pre_sep + col.sum + "('" + colx + "')";
+      this.selectText_ += pre_sep + col.sum + "('" + colx + "')";
     } else {
-      select_text = select_text + pre_sep + "'" + colx + "'";
+      this.selectText_ += pre_sep + "'" + colx + "'";
     }
     if (col.rename)
-      select_text = select_text + " as '" + col.rename + "'";
+      this.selectText_ += " as '" + col.rename + "'";
   }
-  document.getElementById("selectedColumns").value = select_text; 
+  document.getElementById("selectedColumns").innerHTML = this.selectText_; 
 }
 
 // create zips
