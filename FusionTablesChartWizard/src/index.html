@@ -33,21 +33,18 @@
     <h1>Fusion Tables Chart Wizard</h1>
 
     <p class="intro">
-      This wizard helps you create the HTML or URL to embed a chart based on 
-      data in a Fusion Table in another web page.
+      This wizard creates the code or URL you need to display a Fusion Tables
+      chart on its own or embedded in another web page.
+      <span>Note that the table must be
+      <b>public or unlisted </b><u>and</u><b> exportable</b>. </span>
+    <p>
+    After configuring your chart, you will have three ways to use the chart: 
     </p>
-    <p class="intro">
-      First specify the docid of a Fusion Table with data you
-      would like to chart. The column picker drop down will allow you to 
-      select which columns contain the data for the chart.
-      By default only the first 100 rows will be fetched and you
-      can then configure a chart to visualize these rows. In the Basic Options
-      section you can change the row limit as well as
-      filter and sort the rows. The Advanced Options section allows for more
-      complex customization of the data used for the chart.
-      After creating your chart, you have three alternatives to include the
-      chart in your own web pages: use the iframe, use the URL provided in
-      your own code or use the HTML provided to create your own pages.
+    <ul>
+      <li>A URL you can use directly.</li>
+      <li>The code for an iframe that you can include in a web page.</li>
+      <li>The complete HTML code to create its own page. </li>
+    </ul>
     </p>
     <p class="intro"> 
       Please report problems or feature requests in the 
@@ -55,14 +52,10 @@
       Issue Tracker</a>
     </p>
     
-    <div id="form-div">
-      <h3 class="required">Requires docid of Fusion Table and list of columns
-      </h3> 
-      <p class="note">
-        The table needs to be <b>public or unlisted and exportable</b>.
-      </p>
+    <div class="form-div">
+      <h3 class="required">1. Enter table id and choose columns:</h3> 
       <div class="form-element">
-        <label for="tableid">Your Table docid:</label>
+        <label for="tableid">Enter encrypted table id (docid):</label>
         <input
           type="text" 
           id="tableid" 
@@ -72,26 +65,27 @@
       </div>
       <br/>
       <div class="form-element">
-        List of selected columns: 
-        <div 
-          id="selectedColumns" 
-          class="colList"> 
-        </div><br/>
-        Select column from 
-        <select 
-          id="selectColumns" 
-          class="right" 
-          disabled="disabled" 
-          onchange="ftchartWiz.addremoveColumn()" >
-          <option value="">
-            --Select--
-          </option>
-        </select>
-        to add or remove from above list of selected columns        
+        <table class="selecttable">
+        <tr>
+          <td class="picker"> 
+          <select 
+            id="selectColumns" 
+            class="right" 
+            disabled="disabled" 
+            onchange="ftchartWiz.addremoveColumn()" >
+            <option value="">
+              --Select Column--
+            </option>
+          </select>
+          </td>
+          <td class="colList" id="selectedColumns"/>
+        </tr>
+        </table>
       </div>
 
-      <h4 id="header1" class="option"><img src="images/blank.gif"/>
-        Basic Options (filter, sort and limit number of rows)
+      <h4 id="header1" class="option">
+        2. Choose filter and sort criteria and and number of rows to display
+        in chart:
       </h4>
       <div id="content1">
         <br/>
@@ -102,6 +96,7 @@
             id="filter" 
             size="50" 
             onchange="ftchartWiz.updateChart()"/>
+          Enter an expression such as: 'Country' = USA 
       	</div>
       	<div class="form-element">
       	  <label for="limit">Row LIMIT: </label>
@@ -110,6 +105,7 @@
             id="limit" 
             size="4" value="100" 
             onchange="ftchartWiz.updateChart()"/>
+          By default, only the first 100 rows of data are displayed.
       	</div>
         <br/>
       	<div class="form-element">
@@ -142,7 +138,7 @@
       	</div>
       </div>
       <h4 id="header2" class="option"><img src="images/blank.gif"/>
-        Advanced Options (summarize groups of rows, change formatting and
+        3. Advanced Options (summarize groups of rows, change formatting and
         column names)
       </h4>
       <div id="content2">
@@ -156,15 +152,7 @@
       	  </select>
       	</div>
       	<div class="form-element">
-          choose how to summarize the values:
-      	  <input type="radio" name="sumtype" value="sum" checked="checked">
-          sum</input>
-      	  <input type="radio" name="sumtype" value="average" >average</input>
-      	  <input type="radio" name="sumtype" value="min" >min</input>
-      	  <input type="radio" name="sumtype" value="max" >max</input>
-      	  <input type="radio" name="sumtype" value="count" >count</input>
-          <br/>
-      	  <label for="sumbyColumn">Choose Column with values to summarize:
+      	  <label for="sumbyColumn">Summarize values in this column:
           </label>
       	  <select 
             id="sumbyColumn" 
@@ -175,40 +163,48 @@
       	      --Select--
       	    </option>
       	  </select>
+          using 
+      	  <input type="radio" name="sumtype" value="sum" checked="checked">
+          sum</input>
+      	  <input type="radio" name="sumtype" value="average" >average</input>
+      	  <input type="radio" name="sumtype" value="min" >min</input>
+      	  <input type="radio" name="sumtype" value="max" >max</input>
+      	  <input type="radio" name="sumtype" value="count" >count</input>
       	</div>
         <br/>
         <div class="form-element">
-          <label> Change formatting of data used for Chart</label><br/>
-          List of columns with formats: 
-          <div
-             id="formattedColumns" 
-             class="colList">
-          </div><br/>
-          Apply this format (see 
-          <a href="http://code.google.com/apis/chart/interactive/docs/reference.html#formatters">format patterns</a>) 
-          <input type="text" id="columnformat" size="10"/> to this column
-          <select 
-            id="selectformatColumns" 
-            class="right" 
-            disabled="disabled" 
-            onchange="ftchartWiz.addformattoColumn()" >
-            <option value="">
-              --Select--
-            </option>
-          </select>
-          <br/>
-          H-axis format: 
-          <input
-            type="text" id="haxisformat" 
-            size="10" onchange="ftchartWiz.updateChart()"/>
-          V-axis format: 
-          <input
-            type="text" id="vaxisformat" size="10"
-            onchange="ftchartWiz.updateChart()"/> 
+          <table>
+            <tr><td>
+            Apply this format (see 
+            <a href="http://code.google.com/apis/chart/interactive/docs/reference.html#formatters">
+            format patterns</a>) 
+            <input type="text" id="columnformat" size="10"/>to
+            <select 
+              id="selectformatColumns" 
+              class="right" 
+              disabled="disabled" 
+              onchange="ftchartWiz.addformattoColumn()" >
+              <option value="">
+                --Column to format--
+              </option>
+            </select>
+            </td>
+            <td class="colList" id="formattedColumns"/>
+            </tr><tr><td>
+            H-axis format: 
+            <input
+              type="text" id="haxisformat" 
+              size="10" onchange="ftchartWiz.updateChart()"/>
+            </td></tr><tr><td>
+            V-axis format: 
+            <input
+              type="text" id="vaxisformat" size="10"
+              onchange="ftchartWiz.updateChart()"/> 
+            </td></tr>
+          </table>
         </div>
         <br/>
         <div class="form-element">
-          <label> Rename column for use in Chart</label><br/>
           Rename this column
           <select 
            id="selectrenameColumns" 
@@ -224,6 +220,9 @@
         </div>
       </div>
       <br/>
+      <h4 class="option">
+         4. Click "Configure Chart" to use the Chart Editor 
+      </h4>
       <input
         type="button" 
         id="ConfigureChart" 
@@ -251,14 +250,14 @@
       <br/>
       <div id='visualization'></div> 
 
-      <h3 id="headeriframe" class="output">
-        <img src="images/blank.gif"/>Your iframe
-      </h3>
-      <textarea id="chartiframe"></textarea>
       <h3 id="headerURL" class="output">
         <img src="images/blank.gif"/>Your URL
       </h3>
       <textarea id="chartURL"></textarea>
+      <h3 id="headeriframe" class="output">
+        <img src="images/blank.gif"/>Your iframe
+      </h3>
+      <textarea id="chartiframe"></textarea>
       <h3 id="headerHTML" class="output">
         <img src="images/blank.gif"/>Your HTML
       </h3>

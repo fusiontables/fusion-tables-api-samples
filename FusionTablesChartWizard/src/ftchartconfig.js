@@ -218,19 +218,19 @@ ftchartconfig.prototype.updateURL = function() {
       var options = this.wrapper_.getOptions();
       for (var optx in options) {
           // if option in exclude list skip to next option
-	  if (this.exclOpts_[ optx])
-	    continue;
+	  //if (this.exclOpts_[ optx])
+	  //  continue;
           var opt_obj = options[ optx];
           if (typeof( opt_obj) === 'string') {
       	  url = url + "&gco_" + optx + "=" + encodeURIComponent(opt_obj);
           } else { 
             // recode arrays as object with properties 0:, 1:  (temporary fix)
-      	    if (opt_obj instanceof Array && (!(typeof(opt_obj[0]) === 'string')) ) {
-      	    var new_opt_obj = {};
-              for (objx=0; objx<opt_obj.length; objx++)
-      	       new_opt_obj[objx] = opt_obj[objx];
-              opt_obj = new_opt_obj; 
-	    }
+      	    //if (opt_obj instanceof Array && (!(typeof(opt_obj[0]) === 'string')) ) {
+      	    //var new_opt_obj = {};
+            //  for (objx=0; objx<opt_obj.length; objx++)
+      	    //   new_opt_obj[objx] = opt_obj[objx];
+            //  opt_obj = new_opt_obj; 
+	    //}
       	    var option_text = JSON.stringify( opt_obj);
             option_text.replace(/\n/gm,"");
             url = url + "&gco_" + optx + "=" + encodeURIComponent( option_text);
@@ -536,7 +536,6 @@ ftchartconfig.prototype.updateSelectText = function() {
 
 // create zips
 ftchartconfig.prototype.createZips = function() {
-  this.zips_.push(new goog.ui.AnimatedZippy('header1', 'content1'));
   this.zips_.push(new goog.ui.AnimatedZippy('header2', 'content2'));
   this.zips_.push(new goog.ui.AnimatedZippy('headeriframe', 'chartiframe'));
   this.zips_.push(new goog.ui.AnimatedZippy('headerURL', 'chartURL'));

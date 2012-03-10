@@ -1,3 +1,7 @@
+body {
+  font-family: Arial, sans-serif;
+  padding-left: 10px;
+}
 p.intro {
   width: 800px;
 }
@@ -15,7 +19,6 @@ h3.required {
   margin-bottom: 0px;
   cursor: pointer;
   padding: 1px 3px;
-  width: 800px;
 }
 h3.output {
   background: #A0A0E0;
@@ -31,7 +34,6 @@ h4.option {
   margin-bottom: 0px;
   cursor: pointer;
   padding: 1px 3px;
-  width: 800px;
 }
 input[type='button'].config {
   width: 150px;
@@ -46,10 +48,12 @@ img {
 textarea {
   font-size: 12px;
 }
-div.colList {
-  background-color:#F0F0F0;
-  vertical-align:text-bottom;
+div.form-div {
   width:800px;
+}
+td.colList {
+  background-color:#F0F0F0;
+  font-family: Courier, sans-serif;
 }
 textarea#chartiframe {
   width:800px;
