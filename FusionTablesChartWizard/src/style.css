@@ -57,12 +57,15 @@ textarea {
   font-size: 12px;
 }
 textarea#chartiframe {
+  width:99%;
   height:120px;
 }
 textarea#chartURL {
+  width:99%;
   height:100px;
 }
 textarea#htmlCode {
+  width:99%;
   height:600px;
 }
 .goog-zippy-expanded img {
