@@ -344,6 +344,12 @@ var ftchartconfig_response_context;
 // this.columnSelectorIds_ contains list of element ids in document that contain column selector
 ftchartconfig.prototype.fetchColumns = function() {
   this.colList_ = {};
+  this.colType_ = {};
+  this.selectText_ = "";
+  this.wrapper_ = {}; 
+  this.hformat_ = "";
+  this.vformat_ = "";
+
   this.updateSelectText();
   for (var colSelId in this.columnSelectorIds_) {
     var menu = document.getElementById( colSelId);
@@ -465,8 +471,13 @@ ftchartconfig.prototype.addsummaryColumn = function() {
   }
 
   // if colname in list add summary
-  if (this.colList_[ colname]) 
-      this.colList_[ colname]["sum"] = sum_func;
+  var colElem = this.colList_[ colname];
+  if (colElem) {
+      if (colElem.sum && colElem.sum === sum_func)
+	delete this.colList_[ colname]["sum"];
+      else
+        colElem.sum = sum_func;
+  }
   else {
       // generate error
   }

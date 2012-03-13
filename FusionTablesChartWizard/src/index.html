@@ -41,9 +41,11 @@
     After configuring your chart, you will have three ways to use the chart: 
     </p>
     <ul>
-      <li>A URL you can use directly.</li>
-      <li>The code for an iframe that you can include in a web page.</li>
-      <li>The complete HTML code to create its own page. </li>
+      <li><a href="#headerURL">A URL you can use directly.</a></li>
+      <li><a href="#headeriframe">
+      The code for an iframe that you can include in a web page.</a></li>
+      <li><a href="#headerHTML">
+      The complete HTML code to create its own page.</a></li>
     </ul>
     </p>
     <p class="intro"> 
@@ -96,7 +98,7 @@
             id="filter" 
             size="50" 
             onchange="ftchartWiz.updateChart()"/>
-          Enter an expression such as: 'Country' = USA 
+          example expression: Country = 'USA' and 'Total Sales' > 100 
       	</div>
       	<div class="form-element">
       	  <label for="limit">Row LIMIT: </label>
@@ -223,32 +225,40 @@
       <h4 class="option">
          4. Click "Configure Chart" to use the Chart Editor 
       </h4>
-      <input
-        type="button" 
-        id="ConfigureChart" 
-        value="Configure Chart" 
-        class="config" onclick="ftchartWiz.openEditor()"/>
-      <br/>
-      <br/>
-      <div class="form-element">
-        <div class="right">
-          <label for="chartwidth">Optional Chart Dimensions: W:</label> 
-          <input 
-            type="text" 
-            id="chartwidth" 
-            class="short-input" 
-            value="500" 
-            onchange="ftchartWiz.updateChart()"> px,
-          <label for="chartheight">H:</label> 
+      <table>
+      <tr><td class="config">
+      	<table>
+        <tr><td colspan="2">      
           <input
-            type="text" 
-            id="chartheight" 
-            class="short-input" value="400"
-            onchange="ftchartWiz.updateChart()"> px
-        </div>
-      </div>
-      <br/>
-      <div id='visualization'></div> 
+            type="button" 
+            id="ConfigureChart" 
+            value="Configure Chart"
+            class="config" onclick="ftchartWiz.openEditor()"/>
+        </td></tr>
+      	<tr><td>
+      	   Width
+      	</td><td>
+      	   <input 
+      	      type="text" 
+      	      id="chartwidth" 
+      	      class="short-input" 
+      	      value="500" 
+      	      onchange="ftchartWiz.updateChart()">px
+      	</td></tr>
+      	<tr><td>
+      	    Height
+      	</td><td>
+      	    <input
+      	      type="text" 
+      	      id="chartheight" 
+      	      class="short-input" value="400"
+      	      onchange="ftchartWiz.updateChart()">px
+      	</td></tr>
+      	</table>
+      </td>
+      <td id='visualization'/>
+      </tr>
+      </table>
 
       <h3 id="headerURL" class="output">
         <img src="images/blank.gif"/>Your URL

@@ -1,9 +1,9 @@
 body {
   font-family: Arial, sans-serif;
   padding-left: 10px;
+  width: 900px;
 }
 p.intro {
-  width: 800px;
 }
 h2 {
   background: #C0C0FF;
@@ -11,7 +11,6 @@ h2 {
   margin-bottom: 0px;
   cursor: pointer;
   padding: 1px 3px;
-  width: 800px;
 }
 h3.required {
   background: #C0C0FF;
@@ -26,7 +25,6 @@ h3.output {
   margin-bottom: 0px;
   cursor: pointer;
   padding: 1px 3px;
-  width: 800px;
 }
 h4.option {
   background: #E0E0E0;
@@ -36,35 +34,35 @@ h4.option {
   padding: 1px 3px;
 }
 input[type='button'].config {
-  width: 150px;
+  width: 100%;
   height: 45px;
   font-size: 100%;
   font-weight: bold;
+}
+input.short-input {
+  width: 50px
 }
 img {
   width: 19px;
   height: 16px;
 }
-textarea {
-  font-size: 12px;
-}
-div.form-div {
-  width:800px;
-}
 td.colList {
   background-color:#F0F0F0;
   font-family: Courier, sans-serif;
 }
+td#visualization {
+  border: 1px;
+}
+textarea {
+  font-size: 12px;
+}
 textarea#chartiframe {
-  width:800px;
   height:120px;
 }
 textarea#chartURL {
-  width:800px;
   height:100px;
 }
 textarea#htmlCode {
-  width:800px;
   height:600px;
 }
 .goog-zippy-expanded img {
