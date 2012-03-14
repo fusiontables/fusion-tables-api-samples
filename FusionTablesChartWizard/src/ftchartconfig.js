@@ -368,7 +368,7 @@ ftchartconfig.prototype.fetchColumns = function() {
         "&jsonCallback=configureSelectColumns"
     );
     document.body.appendChild(script);
-  }
+  } 
 
   // clear all areas
   document.getElementById( 'selectedColumns').innerHTML = "";
@@ -379,6 +379,13 @@ ftchartconfig.prototype.fetchColumns = function() {
   // clear the visualization div
   var vizDiv = document.getElementById("visualization");  
   while ( vizDiv.firstChild ) vizDiv.removeChild( vizDiv.firstChild );
+
+  // disable column selectors
+  for (var colSelectId in this.columnSelectorIds_) {
+    var colSelectElem = document.getElementById( colSelectId);
+    colSelectElem.disabled = true;
+  } 
+
 }
 
 // actually add the columns from the table to the select columns in the form
