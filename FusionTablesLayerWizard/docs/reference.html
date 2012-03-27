@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>
+      Fusion Tables Layer Wizard Reference
+    </title>
+    <link
+        rel="stylesheet"
+        type="text/css" href="http://code.google.com/css/codesite.css"></link>
+    <link
+        rel="stylesheet"
+        type="text/css" href="../util/reference_style.css"></link>
+    <style>
+      #map_canvas { width: 500px;height: 400px; }
+    </style>
+
+    <script type="text/javascript"src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript">
+      var map;
+
+      var layer;
+      var tableid = 297050;
+
+      function initialize() {
+        map = new google.maps.Map(document.getElementById('map_canvas'), {
+          center: new google.maps.LatLng(37.51844023887863, -122.20367431640625),
+          zoom: 9,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+
+        var style = [
+          {
+            featureType: 'all',
+            elementType: 'all',
+            stylers: [
+              { saturation: -45 }
+            ]
+          }
+        ];
+
+        var styledMapType = new google.maps.StyledMapType(style, {
+          map: map,
+          name: 'Styled Map'
+        });
+
+        map.mapTypes.set('map-style', styledMapType);
+        map.setMapTypeId('map-style');
+
+        layer = new google.maps.FusionTablesLayer(tableid);
+        layer.setQuery("SELECT 'Address' FROM " + tableid);
+        layer.setMap(map);
+      }
+
+      function changeMap() {
+        var searchString = document.getElementById('search-string').value.replace(/'/g, "\\'");
+        if(!searchString) {
+          layer.setQuery("SELECT 'Address' FROM " + tableid);
+          return;
+        }
+        layer.setQuery("SELECT 'Address' FROM " + tableid + " WHERE 'Store Name' = '" + searchString + "'");
+      }
+    </script>
+  </head>
+  <body onload="initialize()">
+    <h1>
+      Fusion Tables Layer Wizard Reference
+    </h1>
+    <p>
+      This tool allows you to generate HTML code for adding an interactive
+      map or a map with 2 Fusion Tables Layers to your website.
+    </p>
+    <h2>
+      To use:
+    </h2>
+    <ol>
+      <li>
+        Fill out the layer form with information about your
+        Fusion Table. Your table needs to be unlisted or public and
+        exportable in order to use the wizard.
+      </li>
+      <li>
+        After adding the layer to the map, zoom in and drag the map
+        to center your data on the map. As you make these changes,
+        the HTML in the text area below is updated to match your
+        settings.
+      </li>
+      <li>
+        Show or hide map elements, or change the grayscale of the map.
+        Note that styled maps are subject to the Maps API
+        <a href="http://code.google.com/apis/maps/faq.html#usagelimits">usage
+        limits</a>.
+      </li>
+      <li>
+        Select another feature to add to your map. This can be:
+        <ul>
+          <li>Another layer</li>
+          <li>A text search element</li>
+          <li>A select-based search element</li>
+        </ul>
+      </li>
+      <li>
+        When done, copy the HTML code provided and paste in an HTML
+        file. You now have an interactive map or a map with 2 layers,
+        no coding required!
+      </li>
+    </ol>
+    <h2>
+      Example:
+    </h2>
+    <p>
+      Here is an example of an interactive map created using Fusion
+      Tables Layer Wizard:
+    </p>
+    <div id="map_canvas"></div>
+
+    <div style="margin-top: 10px;">
+      <label>Store name </label>
+      <select id="search-string" onchange="changeMap(this.value);">
+        <option value="">--Select--</option>
+        <option value="JJs Express">JJs Express</option>
+        <option value="John Paul's Pizzeria">John Paul's Pizzeria</option>
+        <option value="John's Pizza">John's Pizza</option>
+      </select>
+    </div>
+    <p>
+      Here is the generated code:
+    </p>
+<pre>
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;head>
+&lt;style>
+  #map_canvas { width: 500px;height: 400px; }
+&lt;/style>
+
+&lt;script type="text/javascript"src="http://maps.google.com/maps/api/js?sensor=false">&lt;/script>
+&lt;script type="text/javascript">
+var map;
+
+var layer;
+var tableid = 297050;
+
+function initialize() {
+  map = new google.maps.Map(document.getElementById('map_canvas'), {
+    center: new google.maps.LatLng(37.51844023887863, -122.20367431640625),
+    zoom: 9,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  });
+
+  var style = [
+    {
+      featureType: 'all',
+      elementType: 'all',
+      stylers: [
+        { saturation: -45 }
+      ]
+    }
+  ];
+
+  var styledMapType = new google.maps.StyledMapType(style, {
+    map: map,
+    name: 'Styled Map'
+  });
+
+  map.mapTypes.set('map-style', styledMapType);
+  map.setMapTypeId('map-style');
+
+  layer = new google.maps.FusionTablesLayer(tableid);
+  layer.setQuery("SELECT 'Address' FROM " + tableid);
+  layer.setMap(map);
+}
+
+function changeMap() {
+  var searchString = document.getElementById('search-string').value.replace(/'/g, "\\'");
+  if(!searchString) {
+    layer.setQuery("SELECT 'Address' FROM " + tableid);
+    return;
+  }
+  layer.setQuery("SELECT 'Address' FROM " + tableid + " WHERE 'Store Name' = '" + searchString + "'");
+}
+&lt;/script>
+
+&lt;/head>
+&lt;body onload="initialize();">
+
+&lt;div id="map_canvas"></div>
+
+&lt;div style="margin-top: 10px;">
+  &lt;label>Store name &lt;/label>
+  &lt;select id="search-string" onchange="changeMap(this.value);">
+    &lt;option value="">--Select--</option>
+    &lt;option value="JJs Express">JJs Express</option>
+    &lt;option value="John Paul's Pizzeria">John Paul's Pizzeria</option>
+    &lt;option value="John's Pizza">John's Pizza</option>
+  &lt;/select>
+&lt;/div>
+
+&lt;/body>
+&lt;/html>
+</pre>
+  </body>
+</html>
