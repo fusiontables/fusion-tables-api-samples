@@ -30,6 +30,16 @@ label {
   cursor: pointer;
 }
 
+#layer-forms div {
+  background-color: #E8E8E8;
+  padding: 5px;
+  margin-bottom: 5px;
+}
+
+#add-layer {
+  display: None;
+}
+
 .clear {
   clear: both;
 }
