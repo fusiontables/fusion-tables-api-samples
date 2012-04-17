@@ -8,7 +8,7 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="UTF-8">
 
-    <title>FusionTablesLayer Builder</title>
+    <title>FusionTablesLayer Wizard</title>
 
     <script
       type="text/javascript"
@@ -21,7 +21,7 @@
 
   <body>
 
-    <h1>FusionTablesLayer Builder</h1>
+    <h1>FusionTablesLayer Wizard</h1>
 
     <p>
       This wizard helps you create the HTML for a map with a FusionTablesLayer
@@ -64,6 +64,10 @@
       <h2>
         Edit Map
       </h2>
+
+      <div class="form-element">
+        Zoom and pan the map to center the view on your data.
+      </div>
       <div class="form-element">
         <label>
           Dimensions:
@@ -73,13 +77,13 @@
           H: <input type="text" id="map-height" class="short-input"> px
         </div>
       </div>
-      <div class="form-element">
+      <div class="form-element" style="display:None">
         <label>
           Map Center:
         </label>
         <input type="text" id="map-center" class="right" disabled="disabled">
       </div>
-      <div class="form-element">
+      <div class="form-element" style="display:None">
         <label>
           Zoom:
         </label>
@@ -215,8 +219,9 @@
     </div>
 
     <script type="text/javascript">
+
       var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-12846745-15']);
+      _gaq.push(['_setAccount', 'UA-9117623-10']);
       _gaq.push(['_trackPageview']);
 
       (function() {
@@ -224,10 +229,11 @@
         ga.type = 'text/javascript';
         ga.async = true;
         ga.src = ('https:' == document.location.protocol ?
-          'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(ga, s);
       })();
+
     </script>
 
   </body>
