@@ -13,6 +13,7 @@ ftchartconfig = function( width, height, baseUrl) {
     'PieChart':1,
     'AreaChart':1,
     'GeoChart':1,
+    'ScatterChart':1,
     'ColumnChart':1};
   this.columnSelectorIds_ = {
     selectColumns:'default',
