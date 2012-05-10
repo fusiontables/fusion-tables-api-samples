@@ -262,12 +262,15 @@ Html.prototype.fusionTableLayers = function() {
     textArea.push(layer.locationColumn);
     textArea.push('\'",');
     textArea.push(this.newLineIndent(5));
-    textArea.push('from: ');
+    textArea.push("from: '");
     textArea.push(layer.tableId);
-    if (layer.filter) {
+    textArea.push("'");
+    if (layer.where) {
+      textArea.push(',');
       textArea.push(this.newLineIndent(5));
-      textArea.push(', where: ');
+      textArea.push('where: "');
       textArea.push(layer.where);
+      textArea.push('"');
     }
     textArea.push(this.newLineIndent(4));
     textArea.push('},');
