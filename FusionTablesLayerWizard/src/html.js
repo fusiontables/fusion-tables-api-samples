@@ -4,6 +4,8 @@
  * Constructs the HTML for the text area.
  *
  */
+ 
+ goog.provide('Builder.html');
 
 /**
  * Html constructor.
@@ -276,6 +278,18 @@ Html.prototype.fusionTableLayers = function() {
     textArea.push('},');
     textArea.push(this.newLineIndent(4));
     textArea.push('map: map');
+    if (layer.styleId) {
+      textArea.push(',');
+      textArea.push(this.newLineIndent(4));
+      textArea.push('styleId: ');
+      textArea.push(layer.styleId);
+    }
+    if (layer.templateId) {
+      textArea.push(',');
+      textArea.push(this.newLineIndent(4));
+      textArea.push('templateId: ');
+      textArea.push(layer.templateId);
+    }
     textArea.push(this.newLineIndent(3));
     textArea.push('});');
   }
@@ -311,9 +325,9 @@ Html.prototype.searches = function() {
       textArea.push(layer.locationColumn);
       textArea.push('\'",');
       textArea.push(this.newLineIndent(5));
-      textArea.push('from: ');
+      textArea.push('from: \'');
       textArea.push(layer.tableId);
-      textArea.push(',');
+      textArea.push('\',');
       textArea.push(this.newLineIndent(5));
       textArea.push('where: "\'');
       textArea.push(layer.search.column);

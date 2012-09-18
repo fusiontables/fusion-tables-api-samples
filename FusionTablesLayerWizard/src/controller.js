@@ -3,6 +3,9 @@
  *
  * Controls the DOM interactions.
  */
+ 
+ goog.provide('Builder.controller');
+
 
 /**
  * Controller constructor.
@@ -104,7 +107,7 @@ Controller.prototype.initialize = function() {
       });
 
   // Map center change: Update center text box.
-  google.maps.event.addListener(this.map.map, 'center_changed', 
+  google.maps.event.addListener(this.map.map, 'center_changed',
       function() {
         var center = that.map.map.getCenter();
         document.getElementById('map-center').value =
@@ -133,13 +136,13 @@ Controller.prototype.constructLayerForm = function() {
   layerForm.id = 'layer-form-' + nextLayerId;
 
   // Table Id
-  var tableIdLabel = this.createLabel('Your table id:');
+  var tableIdLabel = this.createLabel('Your table id');
   var tableIdInput = this.createTextInput('table-id-' + nextLayerId);
   var tableIdFormElement = this.createFormElement([tableIdLabel, tableIdInput]);
   layerForm.appendChild(tableIdFormElement);
 
   // Location column
-  var locationColumnLabel = this.createLabel('Location Column:');
+  var locationColumnLabel = this.createLabel('Location Column');
   var locationColumnOptions = [{ 'value': '', 'innerHtml': '--Select--' }];
   var locationColumnInput = this.createSelect(
       'location-column-' + nextLayerId, locationColumnOptions);
@@ -148,12 +151,24 @@ Controller.prototype.constructLayerForm = function() {
       [locationColumnLabel, locationColumnInput]);
   layerForm.appendChild(locationColumnFormElement);
 
+  // Style ID for New look
+  var styleIdLabel = this.createLabel('Style ID (New look)');
+  var styleIdInput = this.createTextInput('style-id-' + nextLayerId);
+  var styleIdFormElement = this.createFormElement([styleIdLabel, styleIdInput]);
+  layerForm.appendChild(styleIdFormElement);
+
+  // Template ID for New look
+  var templateIdLabel = this.createLabel('Template ID (New look)');
+  var templateIdInput = this.createTextInput('template-id-' + nextLayerId);
+  var templateIdFormElement = this.createFormElement([templateIdLabel, templateIdInput]);
+  layerForm.appendChild(templateIdFormElement);
+
   // Filter
-  var filterLabel = this.createLabel('Filter (optional):');
+  var filterLabel = this.createLabel('Filter (optional)');
   var filterInput = this.createTextInput('where-' + nextLayerId);
   var filterFormElement = this.createFormElement([filterLabel, filterInput]);
   layerForm.appendChild(filterFormElement);
-
+ 
   // Layer buttons
   var putLayerInput = this.createButton('put-layer-' + nextLayerId,
       'Put layer on Map');
@@ -166,7 +181,7 @@ Controller.prototype.constructLayerForm = function() {
   layerForm.appendChild(buttonsFormElement);
 
   // Search feature
-  var addSearchLabel = this.createLabel('Add a search feature:');
+  var addSearchLabel = this.createLabel('Add a search feature');
   var searchColumnOptions = [{ 'value': '', 'innerHtml': '--Select--' },
       { 'value': 'text-' + nextLayerId, 'innerHtml': 'Text-based search' },
       { 'value': 'select-' + nextLayerId, 'innerHtml': 'Select-based search' }];
@@ -341,7 +356,10 @@ Controller.prototype.layerFormListeners = function(nextLayerId) {
           var locationColumn =
               document.getElementById('location-column-'+nextLayerId).value;
           var where = document.getElementById('where-'+nextLayerId).value;
-          var layerId = that.map.addLayer(tableId, locationColumn, where);
+          var styleId = document.getElementById('style-id-'+nextLayerId).value;
+          var templateId = document.getElementById('template-id-'+nextLayerId).value;
+          var layerId = 
+              that.map.addLayer(tableId, locationColumn, where, styleId, templateId);
           that.html.updateHtml();
           this.style.display = 'None';
           document.getElementById('reset-layer-'+nextLayerId).style.display =

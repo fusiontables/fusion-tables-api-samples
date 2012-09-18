@@ -4,6 +4,8 @@
  * Controls the map.
  *
  */
+ 
+ goog.provide('Builder.map');
 
 /**
  * Map constructor.
@@ -147,11 +149,12 @@ Map.prototype.initialize = function(mapElement) {
  * @param {string} tableId The id of the table.
  * @param {string} locationColumn The location column.
  * @param {string} where A filter for the layer.
+ * @param {string} styleId The id of the map style to use from New look.
  * @return {string} The layer id.
  */
-Map.prototype.addLayer = function(tableId, locationColumn, where) {
+Map.prototype.addLayer = function(tableId, locationColumn, where, styleId, templateId) {
   if (this.layerIds.length) {
-    var layer = new Layer(tableId, locationColumn, where);
+    var layer = new Layer(tableId, locationColumn, where, styleId, templateId);
     layer.setMap(this.map);
     var layerId = this.layerIds.shift();
     this.layers[layerId] = layer;

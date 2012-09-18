@@ -4,6 +4,8 @@
  * Controls the Fusion Table Layer.
  *
  */
+ 
+ goog.provide('Builder.layer');
 
 /**
  * Layer constructor.
@@ -12,8 +14,8 @@
  * @param {string} locationColumn The location column.
  * @param {string} where A filter for the layer.
  */
-var Layer = function(tableId, locationColumn, where) {
-  this.initialize(tableId, locationColumn, where);
+var Layer = function(tableId, locationColumn, where, styleId, templateId) {
+  this.initialize(tableId, locationColumn, where, styleId, templateId);
 };
 
 /**
@@ -41,6 +43,20 @@ Layer.prototype.locationColumn = null;
 Layer.prototype.where = null;
 
 /**
+ * The styleID for the layer in New look.
+ * Found as the y parameter in the embed code.
+ * @type {string}
+ */
+Layer.prototype.styleId = null;
+
+/**
+ * The templateID for the layer in New look.
+ * Found as the tmplt parameter in the embed code.
+ * @type {string}
+ */
+Layer.prototype.templateId = null;
+
+/**
  * Any searches added to the layer (text or select).
  * @type {Object}
  */
@@ -52,16 +68,20 @@ Layer.prototype.search = null;
  * @param {string} locationColumn The location column.
  * @param {string} where A filter for the layer.
  */
-Layer.prototype.initialize = function(tableId, locationColumn, where) {
+Layer.prototype.initialize = function(tableId, locationColumn, where, styleId, templateId) {
   this.tableId = tableId;
   this.locationColumn = locationColumn;
   this.where = where;
+  this.styleId = styleId;
+  this.templateId = templateId;
   this.layer = new google.maps.FusionTablesLayer({
     query: {
       select: locationColumn,
       from: tableId,
       where: where
-    }
+    },
+    styleId: styleId,
+    templateId: templateId
   });
 };
 

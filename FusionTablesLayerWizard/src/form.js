@@ -5,6 +5,7 @@
  *
  */
 
+goog.provide('Builder.form');
 
 /**
  * Form constructor.
