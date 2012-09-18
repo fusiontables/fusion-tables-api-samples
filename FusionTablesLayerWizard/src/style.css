@@ -6,7 +6,15 @@ body {
 h2 {
   font-size: 18px;
   clear: both;
-  margin-bottom: 0px;
+  color: #666666;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #C6D5E6;
+  padding-top: 20px;
+  padding-left: 2px;
+}
+
+h2.map-preview {
+  border-bottom: 0px;
 }
 
 label {
@@ -31,7 +39,7 @@ label {
 }
 
 #layer-forms div {
-  background-color: #E8E8E8;
+  background-color: #C6D5E6;
   padding: 5px;
   margin-bottom: 5px;
 }
