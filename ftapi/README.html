@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+lang="en" xml:lang="en">
+<head>
+<title>Using Fusion Tables from bash</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2012/10/02 12:35:44"/>
+<meta name="author" content="Anno Langen"/>
+<style type="text/css">
+  html {
+        font-family: Verdana, sans-serif;
+	font-size: 10pt;
+        margin: 1.23em;
+  }
+  .title { text-align: center; }
+  .todo  { color: red; }
+  .done { color: green; }
+  .timestamp { color: grey }
+  .timestamp-kwd { color: CadetBlue }
+  .tag { background-color:lightblue; font-weight:normal }
+  .target { background-color: lavender; }
+  pre {
+	border: 1pt solid #AEBDCC;
+	background-color: #F3F5F7;
+	padding: 5pt;
+	font-family: Menlo, monospace;
+  }
+  table { border-collapse: collapse; }
+  td, th {
+	vertical-align: top;
+	<!--border: 1pt solid #ADB9CC;-->
+  }
+</style>
+</head><body>
+<h1 class="title">Using Fusion Tables from bash</h1>
+
+<div class="outline-3">
+<h3>Introduction</h3>
+
+
+<p>
+This code lab shows how to access
+<a href="https://www.google.com/fusiontables">Google Fusion Tables</a>
+from a bash<sup><a class="footref" name="fnr.1" href="#fn.1">1</a></sup> command line. Google provides Fusion Tables to let you visualize
+and share table data. To keep private data secure, a certain amount of setup is
+required to access Fusion Tables from your computer's command line. This code
+lab walks you through that setup and demonstrates success with some extensible
+examples. The
+<a href="https://developers.google.com/fusiontables">developer website</a>
+has more details,
+<a href="https://developers.google.com/fusiontables/docs/sample_code">sample code</a>, and
+<a href="https://developers.google.com/fusiontables/docs/v1/libraries">client libraries</a>
+for specific programming languages. The
+<a href="https://developers.google.com/apis-explorer/#p/fusiontables/v1/">APIs Explorer</a>
+site also provides an interactive web interface to test out calls to the API.
+</p>
+</div>
+
+<div class="outline-3">
+<h3>Installation</h3>
+
+
+<p>
+We will configure bash scripts in this directory to act as an
+<a href="https://developers.google.com/accounts/docs/OAuth2InstalledApp">"installed application"</a>
+for a specific "Google developer project". The installed
+application manages OAuth credentials so that it can access Fusion Table data
+on your behalf.
+</p>
+<ol>
+<li>
+Select or create a project from the
+<a href="https://code.google.com/apis/console">API console</a>.
+Start with the Services page, which is linked from a navigation menu on the
+left, and enable Fusion Tables API. From the API Access page create or
+select an OAuth 2.0 client ID for an "installed application". When creating
+a new client, you will be prompted for some "branding information" that
+helps style the OAuth authorization page.
+</li>
+<li>
+Edit the file <code>credentials.sh</code> to supply the values from the console's API
+Access page for CLIENT_ID, CLIENT_SECRET, and API_KEY.
+</li>
+<li>
+Execute <code>RUN_ME_FIRST.sh</code>, which opens a browser where you grant the
+"installed application" access to your tables. Copy the resulting "code" and
+paste it into the running script's prompt. The script exchanges the code
+for OAuth credentials and updates <code>credentials.sh</code> with them.
+
+</li>
+</ol>
+</div>
+
+<div class="outline-3">
+<h3>Example use</h3>
+
+
+<p>
+Now you are ready to use the other scripts. For example
+<pre>
+ ./ftsql.sh show tables
+</pre>
+lists your tables. Taking one of those IDs you can issue a query like
+<pre>
+ TABLE_ID=15lS4CdWZdi7inPHrCwPNjRjFLywYdskHZE8L
+ ./ftsql.sh "select * from $TABLE_ID limit 10"
+</pre>
+The output consists of comma separated values from a table with country names
+and image URLs to flags.
+<pre>
+ Afghanistan,http://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Afghanistan.svg/22px-Flag_of_Afghanistan.svg.png
+ Albania,http://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Flag_of_Albania.svg/22px-Flag_of_Albania.svg.png
+ Algeria,http://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Flag_of_Algeria.svg/22px-Flag_of_Algeria.svg.png
+</pre>
+</p>
+<p>
+The script <code>ftapi.sh</code> lets you access Fusion Tables features beyond SQL. For
+example
+<pre>
+ function get_table_id() {
+  grep tableId | cut -d\" -f4
+ }
+ TABLE_COPY=$(./ftapi.sh tables/$TABLE_ID | ./ftapi.sh tables -d @- | get_table_id)
+</pre>
+creates a new table with the the schema of the flags table and assigns its ID
+to <code>TABLE_COPY</code>. Here the first call to <code>ftapi.sh</code> retrieves the definition of
+one table and the result is piped as a POST body to create a new table. The
+curl parameter option <code>-d</code> indicates HTTP method POST and <code>@-</code> specifies the
+contents of the standard input stream as the value of the POST body. The
+function <code>get_table_id</code> extracts the quoted right hand side value from a line
+like
+<pre>
+ "tableId": "1-Zrlr9Kle9ljjMl2WjqHfytRKqbVlN_r00ELHig",
+</pre>
+See
+<a href="https://developers.google.com/fusiontables/docs/v1/getting_started#background-operations">this mapping</a>
+of API operations to HTTP methods for more information.
+</p>
+<p>
+Now look at the definition of the copied table.
+<pre>
+ ./ftapi.sh tables/$TABLE_COPY
+</pre>
+Except for the table's ID, the output should look like:
+<pre>
+ {
+  "kind": "fusiontables#table",
+  "tableId": "1-Zrlr9Kle9ljjMl2WjqHfytRKqbVlN_r00ELHig",
+  "name": "Country Flags",
+  "columns": [
+   {
+    "kind": "fusiontables#column",
+    "columnId": 0,
+    "name": "Country",
+    "type": "LOCATION"
+   },
+   {
+    "kind": "fusiontables#column",
+    "columnId": 1,
+    "name": "Flag",
+    "type": "STRING"
+   }
+  ],
+  "isExportable": true,
+  "attribution": "Wikipedia"
+ }
+</pre>
+It is a JSON representation of the copied table metadata.
+</p>
+<p>
+Now let us copy some rows:
+<pre>
+ ./ftsql.sh "select * from $TABLE_ID limit 10" | \
+   sed -e "s@\(.*\),\(.*\)@./ftsql.sh \"insert into $TABLE_COPY (Country,Flag) values('\1', '\2')\"@" | \
+   bash
+</pre>
+Here each line of the comma separated output from <code>ftsql.sh</code> is rewritten to an
+invocation of <code>ftsql.sh</code> to insert a single row. That sure is tedious and will
+also quickly exhaust quota. Fortunately, there is a more efficient way to copy a
+table. This command line will create another copy of the same table and assign
+its ID to <code>TABLE_COPY</code>.
+<pre>
+ TABLE_COPY=$(./ftapi.sh tables/$TABLE_ID/copy -d method=post | get_table_id)
+</pre>
+Verify that rows were copied with
+<pre>
+ ./ftsql.sh "select count() from $TABLE_COPY"
+</pre>
+You should see something like
+<pre>
+ count()
+ 204
+</pre>
+Now look at column 1
+<pre>
+ ./ftapi.sh tables/$TABLE_COPY/columns/1
+</pre>
+You should see something like
+<pre>
+ {
+  "kind": "fusiontables#column",
+  "columnId": 1,
+  "name": "Country",
+  "type": "LOCATION"
+ }
+</pre>
+Finally, let us change the column's type from LOCATION to STRING.
+<pre>
+ ./ftapi.sh tables/$TABLE_COPY/columns/1 | \
+   sed -e 's/LOCATION/STRING/' | \
+   ./ftapi.sh tables/$TABLE_COPY/columns/1 -T -
+</pre>
+Here the curl option <code>-T</code> indicates HTTP method PUT, which is how you update
+rather than insert or create with this API.
+</p>
+<p>
+If you want to work more extensively with JSON in bash, check out
+<a href="https://github.com/kristopolous/TickTick">TickTick</a>.
+</p>
+</div>
+
+<div class="outline-3">
+<h3>Explanations</h3>
+
+
+<p>
+The script <code>RUN_ME_FIRST.sh</code> talks to
+<a href="https://accounts.google.com/o/oauth2/token">https://accounts.google.com/o/oauth2/token</a> to set up an initial working file
+<code>credentials.sh</code>. Code in <code>common.sh</code> updates this file to manage credentials
+for an "installed application" that can access tables on your behalf. The
+script <code>ftsql.sh</code> is the simplest illustration of using the possibly
+refreshed access token. It uses curl to send a POST request to
+<a href="https://www.googleapis.com/fusiontables/v1/query?alt=csv">https://www.googleapis.com/fusiontables/v1/query?alt=csv</a>. Its invocation
+arguments become the value of the request parameter, <code>sql</code>. The script
+<code>ftapi.sh</code> uses curl to send requests to a URI under
+<a href="https://www.googleapis.com/fusiontables/v1">https://www.googleapis.com/fusiontables/v1</a>. The first argument is the
+URI. Additional arguments are passed through to curl. The examples above use
+only <code>-d</code> and <code>-T</code> on the command line. Internally, the scripts also use <code>-H</code>
+to set the following two headers
+<pre>
+ -H "Content-Type: application/json"
+ -H "Authorization: Bearer $access_token"
+</pre>
+</p>
+
+<div class="outline-4">
+<h4>Managing credentials</h4>
+
+
+<p>
+The script <code>RUN_ME_FIRST.sh</code> obtains <code>refresh_token</code>, <code>access_token</code>, and
+<code>expires_in</code> in exchange for the code pasted in Step 3 above.
+<a href="https://developers.google.com/accounts/docs/OAuth2#installed">This documentation</a>
+includes a nice graphic to understand the flow. Function
+<code>ensure_fresh_access_token</code> in <code>common.sh</code> obtains a new <code>access_token</code> after
+the old one expires. A working <code>credentials.sh</code> file looks something like this:
+<pre>
+ CLIENT_ID=148678966448.apps.googleusercontent.com
+ CLIENT_SECRET=YvV6DmasdfghPDaNkOvdcKUa
+ API_KEY=AIzaSasdfghjklvIbuyLXr1PT0cPXJavh9CLQxVg
+ refresh_token="1/FaOigPi4Gasdfghjkl5eSesDqw304EoI45YgaT65UFAM"
+ access_token="ya29.AHES6Zasdfghjkl0KkTMM6ZtY-5_BcM74rwcSQrpp8NIEvNI"
+ expires_in=3600
+ expires_at=1348109704
+</pre>
+</p>
+<p class="footnote"><sup><a class="footnum" name="fn.1" href="#fnr.1">1</a></sup>Tested with Ubuntu, Mac OS, and Cygwin
+</div>
+</div>
+<div id="postamble"><p class="author"> Author: Anno Langen
+<a href="mailto:googletables-feedback@google.com">&lt;googletables-feedback@google.com&gt;</a>
+</p>
+<p class="date"> Date: 2012/10/02 12:35:44</p>
+</div></body>
+</html>
