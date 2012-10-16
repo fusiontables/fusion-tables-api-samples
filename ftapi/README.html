@@ -172,15 +172,20 @@ It is a JSON representation of the copied table metadata.
 <p>
 Now let us copy some rows:
 <pre>
- ./ftsql.sh "select * from $TABLE_ID limit 10" | \
-   sed -e "s@\(.*\),\(.*\)@./ftsql.sh \"insert into $TABLE_COPY (Country,Flag) values('\1', '\2')\"@" | \
-   bash
+ ./ftsql.sh "select * from $TABLE_ID" | sed -e '1 d' | ./ftupload.sh $TABLE_COPY
 </pre>
-Here each line of the comma separated output from <code>ftsql.sh</code> is rewritten to an
-invocation of <code>ftsql.sh</code> to insert a single row. That sure is tedious and will
-also quickly exhaust quota. Fortunately, there is a more efficient way to copy a
-table. This command line will create another copy of the same table and assign
-its ID to <code>TABLE_COPY</code>.
+Here we created a large payload of CSV content without the header row and uploaded
+it to the freshly created table. Expect to see output like this:
+<pre>
+ {
+  "kind": "fusiontables#import",
+  "numRowsReceived": "204"
+ }
+</pre>
+The script <code>ftupload.sh</code> is useful
+to add rows to an existing table.  Duplicating an existing table is specially
+supported in the API. This command line will create another copy of the same
+table and assign its ID to <code>TABLE_COPY</code>.
 <pre>
  TABLE_COPY=$(./ftapi.sh tables/$TABLE_ID/copy -d method=post | get_table_id)
 </pre>
