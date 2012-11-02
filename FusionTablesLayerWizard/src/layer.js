@@ -4,7 +4,7 @@
  * Controls the Fusion Table Layer.
  *
  */
- 
+
  goog.provide('Builder.layer');
 
 /**
@@ -13,6 +13,9 @@
  * @param {string} tableId The id of the table.
  * @param {string} locationColumn The location column.
  * @param {string} where A filter for the layer.
+ * @param {string} styleId The map style to use. Needed for New look.
+ * @param {string} templateId The template for infowindow to use. Needed
+ *     for New look.
  */
 var Layer = function(tableId, locationColumn, where, styleId, templateId) {
   this.initialize(tableId, locationColumn, where, styleId, templateId);

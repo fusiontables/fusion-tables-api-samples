@@ -3,7 +3,7 @@
  *
  * Controls the DOM interactions.
  */
- 
+
  goog.provide('Builder.controller');
 
 
@@ -43,8 +43,8 @@ Controller.prototype.initialize = function() {
   // Initialize form inputs
   document.getElementById('map-width').value = this.map.DEFAULT_WIDTH_;
   document.getElementById('map-height').value = this.map.DEFAULT_HEIGHT_;
-  document.getElementById('map-center').value =
-      this.map.defaultCenter.lat() + ', ' + this.map.defaultCenter.lng();
+  document.getElementById('map-center-lat').value = this.map.defaultCenter.lat();
+  document.getElementById('map-center-lng').value = this.map.defaultCenter.lng();
   document.getElementById('map-zoom').value = this.map.DEFAULT_ZOOM_;
 
   // Initialize slider
@@ -110,8 +110,8 @@ Controller.prototype.initialize = function() {
   google.maps.event.addListener(this.map.map, 'center_changed',
       function() {
         var center = that.map.map.getCenter();
-        document.getElementById('map-center').value =
-            center.lat() + ', ' + center.lng();
+        document.getElementById('map-center-lat').value = center.lat();
+        document.getElementById('map-center-lng').value = center.lng();
         that.map.setCenter(center);
         that.html.updateHtml();
       });
@@ -135,11 +135,48 @@ Controller.prototype.constructLayerForm = function() {
   var layerForm = document.createElement('div');
   layerForm.id = 'layer-form-' + nextLayerId;
 
+
+  // Instructions: Embed link
+  var embedLinkHeader = document.createElement('p');
+  embedLinkHeader.innerHTML = 'Create layer from embed link';
+  embedLinkHeader.id = 'zHeaderEmbedLink-' + nextLayerId;
+  embedLinkHeader.className += 'zHeaderEmbedLink';
+  layerForm.appendChild(embedLinkHeader);
+
+  var zipContentEmbedLink = document.createElement('div');
+  zipContentEmbedLink.id = 'zContentEmbedLink-' + nextLayerId;
+  layerForm.appendChild(zipContentEmbedLink);
+
+  // Publish URL
+  var publishUrlLabel = this.createLabel('Embed link');
+  var publishUrlInput = this.createTextInput('publish-url-' + nextLayerId);
+  var publishUrlFormElement =
+    this.createFormElement([publishUrlLabel, publishUrlInput]);
+  zipContentEmbedLink.appendChild(publishUrlFormElement);
+  var publishUrlNote = this.createNote('Copy this from Tools > Publish.');
+  zipContentEmbedLink.appendChild(publishUrlNote);
+
+
+  // Instructions: Old Fashioned Way
+  var oldFashionedWayHeader = document.createElement('p');
+  oldFashionedWayHeader.innerHTML = 'Or, do it the old-fashioned way';
+  oldFashionedWayHeader.id = 'zHeaderOldFashionedWay-' + nextLayerId;
+  oldFashionedWayHeader.className += 'zHeaderOldFashionedWay';
+  layerForm.appendChild(oldFashionedWayHeader);
+
+  var zipContentOldFashionedWay = document.createElement('div');
+  zipContentOldFashionedWay.id = 'zContentOldFashionedWay-' + nextLayerId;
+  layerForm.appendChild(zipContentOldFashionedWay);
+
+
   // Table Id
   var tableIdLabel = this.createLabel('Your table id');
   var tableIdInput = this.createTextInput('table-id-' + nextLayerId);
   var tableIdFormElement = this.createFormElement([tableIdLabel, tableIdInput]);
-  layerForm.appendChild(tableIdFormElement);
+  zipContentOldFashionedWay.appendChild(tableIdFormElement);
+  var tableIdNote = this.createNote(
+      'Look in File > About to find the Table ID.');
+  zipContentOldFashionedWay.appendChild(tableIdNote);
 
   // Location column
   var locationColumnLabel = this.createLabel('Location Column');
@@ -149,26 +186,36 @@ Controller.prototype.constructLayerForm = function() {
   locationColumnInput.disabled = true;
   var locationColumnFormElement = this.createFormElement(
       [locationColumnLabel, locationColumnInput]);
-  layerForm.appendChild(locationColumnFormElement);
+  zipContentOldFashionedWay.appendChild(locationColumnFormElement);
 
   // Style ID for New look
-  var styleIdLabel = this.createLabel('Style ID (New look)');
+  var styleIdLabel = this.createLabel('Style ID');
   var styleIdInput = this.createTextInput('style-id-' + nextLayerId);
   var styleIdFormElement = this.createFormElement([styleIdLabel, styleIdInput]);
-  layerForm.appendChild(styleIdFormElement);
+  zipContentOldFashionedWay.appendChild(styleIdFormElement);
+  var styleIdNote = this.createNote(
+      'Required with New look. Click Tools > Publish. ' +
+      'Enter the number after "y=" at the end of either URL.');
+  zipContentOldFashionedWay.appendChild(styleIdNote);
+
 
   // Template ID for New look
-  var templateIdLabel = this.createLabel('Template ID (New look)');
+  var templateIdLabel = this.createLabel('Template ID');
   var templateIdInput = this.createTextInput('template-id-' + nextLayerId);
-  var templateIdFormElement = this.createFormElement([templateIdLabel, templateIdInput]);
-  layerForm.appendChild(templateIdFormElement);
+  var templateIdFormElement =
+      this.createFormElement([templateIdLabel, templateIdInput]);
+  zipContentOldFashionedWay.appendChild(templateIdFormElement);
+  var templateIdNote = this.createNote(
+      'Required with New look. Click Tools > Publish. ' +
+      'Enter the number after "tmplt=" at the end of either URL.');
+  zipContentOldFashionedWay.appendChild(templateIdNote);
 
   // Filter
   var filterLabel = this.createLabel('Filter (optional)');
   var filterInput = this.createTextInput('where-' + nextLayerId);
   var filterFormElement = this.createFormElement([filterLabel, filterInput]);
-  layerForm.appendChild(filterFormElement);
- 
+  zipContentOldFashionedWay.appendChild(filterFormElement);
+
   // Layer buttons
   var putLayerInput = this.createButton('put-layer-' + nextLayerId,
       'Put layer on Map');
@@ -262,6 +309,20 @@ Controller.prototype.constructLayerForm = function() {
   layerForm.appendChild(selectSearchForm);
   layerForms.appendChild(layerForm);
 
+  // Zippy
+  var zipEmbedLink = new goog.ui.AnimatedZippy(
+      'zHeaderEmbedLink-' + nextLayerId,
+      'zContentEmbedLink-' + nextLayerId,true);
+  var zipOldFashionedWay = new goog.ui.AnimatedZippy(
+      'zHeaderOldFashionedWay-' + nextLayerId,
+      'zContentOldFashionedWay-' + nextLayerId, false);
+  goog.events.listen(zipOldFashionedWay,
+      goog.ui.Zippy.Events.TOGGLE,
+      function (event) {
+        zipEmbedLink.setExpanded(!event.expanded);
+        }
+      );
+
   this.numLayerForms++;
   return nextLayerId;
 };
@@ -287,6 +348,18 @@ Controller.prototype.createLabel = function(innerHtml) {
   var label = document.createElement('label');
   label.innerHTML = innerHtml;
   return label;
+};
+
+/**
+ * Create a note DOM element.
+ * @param {string} innerHtml The text for the label.
+ */
+Controller.prototype.createNote = function(innerHtml) {
+  var note = document.createElement('p');
+  var noteContent = document.createTextNode(innerHtml);
+  note.appendChild(noteContent);
+  note.className = 'note';
+  return note;
 };
 
 /**
@@ -341,38 +414,95 @@ Controller.prototype.layerFormListeners = function(nextLayerId) {
 
   // On blur table id field: fill the select columns
   google.maps.event.addDomListener(
-      document.getElementById('table-id-'+nextLayerId), 'blur', function() {
-        var menus = [document.getElementById('location-column-'+nextLayerId),
-            document.getElementById('text-query-column-'+nextLayerId),
-            document.getElementById('select-query-column-'+nextLayerId)];
+      document.getElementById('table-id-' + nextLayerId), 'blur', function() {
+        var menus = [document.getElementById('location-column-' + nextLayerId),
+            document.getElementById('text-query-column-' + nextLayerId),
+            document.getElementById('select-query-column-' + nextLayerId)];
         that.fillSelectColumns(menus, this.value);
       });
 
   // Put Layer on map button click: adds layer to map, updates text HTML.
   google.maps.event.addDomListener(
-      document.getElementById('put-layer-'+nextLayerId), 'click', function() {
-        if (Form.checkLayerForm(nextLayerId)) {
-          var tableId = document.getElementById('table-id-'+nextLayerId).value;
-          var locationColumn =
-              document.getElementById('location-column-'+nextLayerId).value;
-          var where = document.getElementById('where-'+nextLayerId).value;
-          var styleId = document.getElementById('style-id-'+nextLayerId).value;
-          var templateId = document.getElementById('template-id-'+nextLayerId).value;
-          var layerId = 
-              that.map.addLayer(tableId, locationColumn, where, styleId, templateId);
-          that.html.updateHtml();
-          this.style.display = 'None';
-          document.getElementById('reset-layer-'+nextLayerId).style.display =
-              'inline';
-          if (that.numLayerForms < that.MAX_LAYER_FORMS_) {
-            document.getElementById('add-layer').style.display = 'inline';
-          }
-        }
-      });
+      document.getElementById('put-layer-' + nextLayerId), 'click', function() {
+
+  // Use iframe embed code or publish link if provided
+  if (document.getElementById('publish-url-' + nextLayerId).value != '') {
+    var embedLink = {};
+    embedLink.url = Form.checkEmbedForm(nextLayerId);
+
+  // Query parameter
+    embedLink.query = embedLink.url.getParameterValue('q');
+
+  // Query parameter: WHERE clause
+    if (embedLink.query.indexOf('where') != -1) {
+    var filter = embedLink.query.substring(6 + embedLink.query.indexOf('where'));
+    embedLink.where = goog.string.urlDecode(filter);
+    }
+
+  // Query parameter: 40-char DocID
+    var ifrom = embedLink.query.indexOf('from');
+    embedLink.docId = embedLink.query.substring(5 + ifrom, 45 + ifrom);
+    // Fill in old-fashioned form and trigger event to
+    // populate select column menus for search feature forms
+    document.getElementById('table-id-' + nextLayerId).value = embedLink.docId;
+    google.maps.event.trigger(document.getElementById('table-id-' + nextLayerId),
+                'blur' );
+  // Location column parameter
+  // TODO: add error checking for missing parameters
+    embedLink.locationColumnId = embedLink.url.getParameterValue('l');
+
+  // Optional parameters
+    embedLink.lat = parseFloat(embedLink.url.getParameterValue('lat'));
+    embedLink.lng = parseFloat(embedLink.url.getParameterValue('lng'));
+    embedLink.styleId = embedLink.url.getParameterValue('y');
+    embedLink.templateId = embedLink.url.getParameterValue('tmplt');
+    embedLink.zoom = parseInt(embedLink.url.getParameterValue('z'),10);
+
+    var layerId =
+      that.map.addLayer(embedLink.docId, embedLink.locationColumnId,
+      embedLink.where, embedLink.styleId, embedLink.templateId);
+    // capture existing map parameters
+    document.getElementById('map-zoom').value = embedLink.zoom;
+    document.getElementById('map-center-lat').value = embedLink.lat;
+    document.getElementById('map-center-lng').value = embedLink.lng;
+    if (embedLink.zoom >=0 ) {
+    that.map.setZoom(embedLink.zoom);
+    }
+    that.map.setCenter(new google.maps.LatLng(embedLink.lat, embedLink.lng));
+    that.map.editMap();
+    that.html.updateHtml();
+
+    this.style.display = 'None';
+    document.getElementById('reset-layer-' + nextLayerId).style.display =
+      'inline';
+
+    if (that.numLayerForms < that.MAX_LAYER_FORMS_) {
+    document.getElementById('add-layer').style.display = 'inline';
+    }
+  } else  // Use specific fields to construct layer, if no embed link
+   if (Form.checkLayerForm(nextLayerId)) {
+    var tableId = document.getElementById('table-id-' + nextLayerId).value;
+    var locationColumn =
+      document.getElementById('location-column-' + nextLayerId).value;
+    var where = document.getElementById('where-' + nextLayerId).value;
+    var styleId = document.getElementById('style-id-' + nextLayerId).value;
+    var templateId =
+        document.getElementById('template-id-' + nextLayerId).value;
+      var layerId = that.map.addLayer(tableId, locationColumn, where,
+                                      styleId, templateId);
+    that.html.updateHtml();
+    this.style.display = 'None';
+    document.getElementById('reset-layer-' + nextLayerId).style.display =
+      'inline';
+    if (that.numLayerForms < that.MAX_LAYER_FORMS_) {
+    document.getElementById('add-layer').style.display = 'inline';
+    }
+  }
+  });
 
   // Remove layer button click: Remove layer.
   google.maps.event.addDomListener(
-      document.getElementById('reset-layer-'+nextLayerId), 'click',
+      document.getElementById('reset-layer-' + nextLayerId), 'click',
           function() {
             window.console.log('Removing layer:' + nextLayerId);
             if (that.map.layers[nextLayerId].search) {
@@ -385,19 +515,22 @@ Controller.prototype.layerFormListeners = function(nextLayerId) {
 
   // Add another feature select menu change: show appropriate form.
   google.maps.event.addDomListener(
-      document.getElementById('add-feature-'+nextLayerId), 'change', function() {
-        var show = this.value;
-        document.getElementById(show).style.display = 'block';
-        var hide = 'text-' + nextLayerId;
-        if (show.search('text') != -1) {
-          hide = 'select-' + nextLayerId;
-        }
-        document.getElementById(hide).style.display = 'none';
-      });
+      document.getElementById(
+          'add-feature-' + nextLayerId),
+          'change',
+          function() {
+            var show = this.value;
+            document.getElementById(show).style.display = 'block';
+            var hide = 'text-' + nextLayerId;
+            if (show.search('text') != -1) {
+              hide = 'select-' + nextLayerId;
+            }
+            document.getElementById(hide).style.display = 'none';
+          });
 
   // Add text query button click: Add a text search under map.
   google.maps.event.addDomListener(
-      document.getElementById('add-text-query-'+nextLayerId), 'click',
+      document.getElementById('add-text-query-' + nextLayerId), 'click',
           function() {
             that.addSearch('text', nextLayerId);
             this.style.display = 'None';
@@ -408,39 +541,39 @@ Controller.prototype.layerFormListeners = function(nextLayerId) {
 
   // Remove text search button click: Remove text search from layer.
   google.maps.event.addDomListener(
-      document.getElementById('reset-text-query-'+nextLayerId), 'click',
+      document.getElementById('reset-text-query-' + nextLayerId), 'click',
       function() {
         window.console.log('Removing text search: ' + nextLayerId);
         that.map.layers[nextLayerId].removeSearch();
         that.removeSearch(nextLayerId);
         that.html.updateHtml();
         this.style.display = 'None';
-        document.getElementById('add-text-query-'+nextLayerId).style.display =
-            'inline';
-        document.getElementById('add-feature-'+nextLayerId).disabled = false;
+        document.getElementById(
+             'add-text-query-' + nextLayerId).style.display = 'inline';
+        document.getElementById('add-feature-' + nextLayerId).disabled = false;
       });
 
   // Add select query button click: Add a select search under map.
   google.maps.event.addDomListener(
-      document.getElementById('add-select-query-'+nextLayerId), 'click',
+      document.getElementById('add-select-query-' + nextLayerId), 'click',
       function() {
         that.addSearch('select', nextLayerId);
         this.style.display = 'None';
-        document.getElementById('reset-select-query-'+nextLayerId).style.display =
-            'inline';
+        document.getElementById(
+            'reset-select-query-' + nextLayerId).style.display = 'inline';
       });
 
   // Remove select search button click: Remove select search and layer query.
   google.maps.event.addDomListener(
-      document.getElementById('reset-select-query-'+nextLayerId), 'click',
+      document.getElementById('reset-select-query-' + nextLayerId), 'click',
       function() {
         that.map.layers[nextLayerId].removeSearch();
         that.removeSearch(nextLayerId);
         that.html.updateHtml();
         this.style.display = 'None';
-        document.getElementById('add-select-query-'+nextLayerId).style.display =
-            'inline';
-        document.getElementById('add-feature-'+nextLayerId).disabled = false;
+        document.getElementById(
+            'add-select-query-' + nextLayerId).style.display = 'inline';
+        document.getElementById('add-feature-' + nextLayerId).disabled = false;
       });
 };
 
@@ -487,8 +620,8 @@ Controller.prototype.fillSelectColumns = function(menus, tableId) {
  */
 Controller.prototype.addSearch = function(type, layerId) {
   var layer = this.map.layers[layerId];
-  var label = document.getElementById(type+'-query-label-'+layerId).value;
-  var column = document.getElementById(type+'-query-column-'+layerId).value;
+  var label = document.getElementById(type + '-query-label-' + layerId).value;
+  var column = document.getElementById(type + '-query-column-' + layerId).value;
   layer.addSearch(type, label, column);
 
   var addSearchDom = function(checkForm, addSearch, eventType, element) {
@@ -503,10 +636,10 @@ Controller.prototype.addSearch = function(type, layerId) {
 
   if (type == 'text') {
     addSearchDom(Form.checkTextForm, this.addTextSearch, 'click',
-        'text-search-'+layerId);
+        'text-search-' + layerId);
   } else if (type == 'select') {
     addSearchDom(Form.checkSelectForm, this.addSelectSearch, 'change',
-        'select-search-'+layerId);
+        'select-search-' + layerId);
 
     // Get the select menu options.
     var query = [];
@@ -530,7 +663,7 @@ Controller.prototype.addSearch = function(type, layerId) {
       that.html.updateHtml();
     });
   }
-  var addFeatureMenu = document.getElementById('add-feature-'+layerId);
+  var addFeatureMenu = document.getElementById('add-feature-' + layerId);
   addFeatureMenu.disabled = addFeatureMenu.disabled ? false : true;
 };
 
@@ -544,7 +677,7 @@ Controller.prototype.addSearch = function(type, layerId) {
 Controller.prototype.addTextSearch = function(label, column, layerId) {
   var mapDiv = document.getElementById('search');
   var div = document.createElement('div');
-  div.setAttribute('id', 'search-'+layerId);
+  div.setAttribute('id', 'search-' + layerId);
   div.style.marginTop = '10px';
 
   var searchLabel = document.createElement('label');
@@ -552,7 +685,7 @@ Controller.prototype.addTextSearch = function(label, column, layerId) {
 
   var input = document.createElement('input');
   input.setAttribute('type', 'text');
-  input.setAttribute('id', 'text-search-'+layerId);
+  input.setAttribute('id', 'text-search-' + layerId);
 
   var button = document.createElement('input');
   button.setAttribute('type', 'button');
@@ -575,14 +708,14 @@ Controller.prototype.addTextSearch = function(label, column, layerId) {
 Controller.prototype.addSelectSearch = function(label, column, layerId) {
   var mapDiv = document.getElementById('search');
   var div = document.createElement('div');
-  div.setAttribute('id', 'search-'+layerId);
+  div.setAttribute('id', 'search-' + layerId);
   div.style.marginTop = '10px';
 
   var searchLabel = document.createElement('label');
   searchLabel.innerHTML = label + '&nbsp;';
 
   var select = document.createElement('select');
-  select.setAttribute('id', 'select-search-'+layerId);
+  select.setAttribute('id', 'select-search-' + layerId);
   select.setAttribute('disabled', 'true');
 
   var option = document.createElement('option');
@@ -606,7 +739,7 @@ Controller.prototype.addSelectSearch = function(label, column, layerId) {
  * @return {Object} The search options array.
  */
 Controller.prototype.selectMenuOptions = function(response, layerId) {
-  var selectMenu = document.getElementById('select-search-'+layerId);
+  var selectMenu = document.getElementById('select-search-' + layerId);
   var searchOptions = [];
   for (var i = 0; i < response['table']['rows'].length; i++) {
     var rowValue = response['table']['rows'][i][0];
@@ -641,7 +774,7 @@ Controller.prototype.runQuery = function(query, callbackName, callback) {
  * @param {string} layerId The id of the layer.
  */
 Controller.prototype.removeSearch = function(layerId) {
-  var searchElement = document.getElementById('search-'+layerId);
+  var searchElement = document.getElementById('search-' + layerId);
   if (searchElement.hasChildNodes()) {
     while (searchElement.childNodes.length > 0) {
       searchElement.removeChild(searchElement.lastChild);
@@ -655,7 +788,7 @@ Controller.prototype.removeSearch = function(layerId) {
  * @param {string} layerId The id of the layer.
  */
 Controller.prototype.removeLayerForm = function(layerId) {
-  var layerForm = document.getElementById('layer-form-'+layerId);
+  var layerForm = document.getElementById('layer-form-' + layerId);
   if (layerForm.hasChildNodes()) {
     while (layerForm.childNodes.length > 0) {
       layerForm.removeChild(layerForm.lastChild);

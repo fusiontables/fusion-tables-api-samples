@@ -4,7 +4,7 @@
  * Constructs the HTML for the text area.
  *
  */
- 
+
  goog.provide('Builder.html');
 
 /**

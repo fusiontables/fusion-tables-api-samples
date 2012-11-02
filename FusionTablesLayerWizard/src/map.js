@@ -4,7 +4,7 @@
  * Controls the map.
  *
  */
- 
+
  goog.provide('Builder.map');
 
 /**
@@ -44,7 +44,7 @@ Map.prototype.DEFAULT_HEIGHT_ = 400;
  * @private
  */
 Map.prototype.defaultCenter;
- 
+
 /**
  * The default zoom of the map.
  * @const
@@ -176,6 +176,12 @@ Map.prototype.editMap = function() {
   var zoom = parseInt(document.getElementById('map-zoom').value, 10);
   this.currentZoom = zoom >= 0 ? zoom : this.DEFAULT_ZOOM_;
   this.map.setZoom(this.zoom);
+ 
+  // Set the map's centerpoint
+  var lat = parseFloat(document.getElementById('map-center-lat').value);
+  var lng = parseFloat(document.getElementById('map-center-lng').value);
+  var center = new google.maps.LatLng(lat,lng);
+  this.map.setCenter(center);
 
   // Resize the map
   var mapDiv = document.getElementById('map-canvas');

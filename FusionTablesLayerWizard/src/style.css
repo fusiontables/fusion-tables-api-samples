@@ -1,6 +1,13 @@
 body {
   font-family: Arial, sans-serif;
   padding-left: 10px;
+  margin: 0;
+  background-color: #eee;
+}
+
+h1 {
+  margin-top: 5px;
+  padding: 0 0 10px 0;
 }
 
 h2 {
@@ -17,8 +24,21 @@ h2.map-preview {
   border-bottom: 0px;
 }
 
+p {
+   max-width: 45em;
+   line-height: 1.5em;
+}
+
 label {
   clear: both;
+}
+
+#pagewrap {
+  width: 1000px;
+  border: 1px solid #C6D5E6;
+  background-color: #fff;
+  margin: 10px auto 10px auto;
+  padding: 20px;
 }
 
 #html-code {
@@ -42,6 +62,11 @@ label {
   background-color: #C6D5E6;
   padding: 5px;
   margin-bottom: 5px;
+}
+
+#layer-forms p.note {
+  padding-left: 5px;
+  margin-bottom: 2px;
 }
 
 #add-layer {
@@ -74,9 +99,11 @@ label {
 }
 
 .note {
-  margin-top: 0;
+  margin-top: 0px;
+  margin-bottom: 10px;
   font-style: italic;
   font-size: 0.7em;
+  max-width: 1000em;
 }
 
 .right-padding {
@@ -86,6 +113,21 @@ label {
 
 .short-input {
   width: 35px;
+}
+.zHeaderEmbedLink {
+  margin-top: 0px;
+  font-size: x-small;
+  line-height: 1px;
+  clear: both;
+  color: #C6D5E6;
+}
+
+.zHeaderOldFashionedWay {
+  margin-top: 0px;
+  font-size: x-small;
+  text-decoration: underline;
+  text-align: right;
+  padding-right: 5px;
 }
 
 .goog-slider {

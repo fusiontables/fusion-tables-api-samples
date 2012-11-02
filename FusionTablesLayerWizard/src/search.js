@@ -4,7 +4,7 @@
  * Search for a Fusion Table Layer.
  *
  */
- 
+
  goog.provide('Builder.search');
 
 /**
