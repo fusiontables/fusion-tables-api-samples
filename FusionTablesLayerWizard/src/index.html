@@ -3,23 +3,21 @@
   Copyright (c) 2012 Google Inc.
 -->
 <html>
-
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="UTF-8">
 
     <title>FusionTablesLayer Wizard</title>
 
-    <script
-      type="text/javascript"
-      src="http://maps.google.com/maps/api/js?sensor=false">
-    </script>
+    <link rel="stylesheet" href="style.css" type="text/css"></link>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
     <script src="builder_compiled.js"></script>
 
-<!-- To set up a working local environment, download the Closure library from
+<!-- To set up a working local environment, download the Closure library with
 svn checkout http://closure-library.googlecode.com/svn/trunk/ closure-library
 
-Then use these calls and comment out "builder_compiled.js" line above.
+Then comment out the "builder_compiled.js" line above and uncomment the following:
 
     <script type="text/javascript" src="../../closure-library/closure/goog/base.js"></script>
     <script type="text/javascript" src="controller.js"></script>
@@ -29,9 +27,17 @@ Then use these calls and comment out "builder_compiled.js" line above.
     <script type="text/javascript" src="map.js"></script>
     <script type="text/javascript" src="search.js"></script>
     <script type="text/javascript" src="builder.js"></script>
--->
-    <link rel="stylesheet" href="style.css" type="text/css"></link>
 
+See builder.js for instructions on rebuilding builder_compiled.js.
+
+For code reviews, you can use Rietveld:
+https://codereview.appspot.com/
+1. Get upload.py: http://code.google.com/p/rietveld/wiki/UploadPyUsage
+2. Make the changes to the code in your svn directory
+3. Use the upload.py file to create a new 'CL' in codereview.appspot.com.
+   See steps 1-4 here:
+   http://fwierzbicki.blogspot.com/2008/08/code-review-with-rietveld.html
+-->
   </head>
 
   <body>
@@ -54,7 +60,7 @@ Then use these calls and comment out "builder_compiled.js" line above.
         more functionality.
       </p>
       <p class="note">Please submit bug reports to our
-        <a href="http://code.google.com/p/fusiontableslayer-builder/issues/list">
+        <a href="https://code.google.com/p/fusion-tables-api-samples/issues/list" target="_blank">
         Issue Tracker</a>.
       </p>
 
@@ -64,8 +70,9 @@ Then use these calls and comment out "builder_compiled.js" line above.
         </h2>
         <p class="note">
           The table needs to be
-          <a href="http://support.google.com/fusiontables/bin/answer.py?hl=en&answer=171221">
-          <b>accessible and exportable</b></a>.</p>
+          <a href="http://support.google.com/fusiontables/bin/answer.py?hl=en&answer=171221"
+             target="_blank">
+          <b>accessible and downloadable</b></a>.</p>
         <div id="layer-forms"></div>
         <div class="form-element">
           <input type="button" id="add-layer" value="Add Layer">

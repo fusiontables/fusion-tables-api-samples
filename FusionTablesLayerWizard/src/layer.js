@@ -70,8 +70,11 @@ Layer.prototype.search = null;
  * @param {string} tableId The id of the table.
  * @param {string} locationColumn The location column.
  * @param {string} where A filter for the layer.
+ * @param {number} styleId The map style ID.
+ * @param {number} templateId The map info window template ID.
  */
-Layer.prototype.initialize = function(tableId, locationColumn, where, styleId, templateId) {
+Layer.prototype.initialize = function(tableId, locationColumn, where, styleId,
+    templateId) {
   this.tableId = tableId;
   this.locationColumn = locationColumn;
   this.where = where;
@@ -124,7 +127,9 @@ Layer.prototype.query = function(value) {
   if (this.where) {
     where += this.where + ' AND ';
   }
-  where += "'" + this.search.column + "'" + comparator + "'" + value + "'";
+  if (value != '--Select--') {
+    where += "'" + this.search.column + "'" + comparator + "'" + value + "'";
+  }
   this.layer.setOptions({
     query: {
       select: this.locationColumn,

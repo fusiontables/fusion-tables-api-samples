@@ -43,7 +43,7 @@ Map.prototype.DEFAULT_HEIGHT_ = 400;
  * @type {google.maps.LatLng}
  * @private
  */
-Map.prototype.defaultCenter;
+Map.prototype.defaultCenter_;
 
 /**
  * The default zoom of the map.
@@ -78,28 +78,28 @@ Map.prototype.height = 400;
  * @type {google.maps.LatLng}
  * @private
  */
-Map.prototype.center = null;
+Map.prototype.center_ = null;
 
 /**
  * The zoom of the map.
  * @type {number}
  * @private
  */
-Map.prototype.zoom = 1;
+Map.prototype.zoom_ = 1;
 
 /**
  * The type of the map.
  * @type {string}
  * @private
  */
-Map.prototype.mapTypeId = google.maps.MapTypeId.ROADMAP;
+Map.prototype.mapTypeId_ = google.maps.MapTypeId.ROADMAP;
 
 /**
  * The saturation of the map.
  * @type {number}
  * @private
  */
-Map.prototype.saturation = 0;
+Map.prototype.saturation_ = 0;
 
 /**
  * The possible map types.
@@ -127,8 +127,8 @@ Map.prototype.layerIds;
 Map.prototype.initialize = function(mapElement) {
   mapElement.style.width = this.DEFAULT_WIDTH_ + 'px';
   mapElement.style.height = this.DEFAULT_HEIGHT_ + 'px';
-  this.defaultCenter = new google.maps.LatLng(0, 0);
-  this.center = this.defaultCenter;
+  this.defaultCenter_ = new google.maps.LatLng(0, 0);
+  this.center_ = this.defaultCenter_;
   this.mapTypes = {
     'roadmap': 'google.maps.MapTypeId.ROADMAP',
     'satellite': 'google.maps.MapTypeId.SATELLITE',
@@ -139,7 +139,7 @@ Map.prototype.initialize = function(mapElement) {
   this.layerIds = ['l0', 'l1', 'l2', 'l3', 'l4'];
 
   this.map = new google.maps.Map(mapElement);
-  this.map.setCenter(this.defaultCenter);
+  this.map.setCenter(this.defaultCenter_);
   this.map.setZoom(this.DEFAULT_ZOOM_);
   this.map.setMapTypeId(this.DEFAULT_MAP_TYPE_);
 };
@@ -149,10 +149,12 @@ Map.prototype.initialize = function(mapElement) {
  * @param {string} tableId The id of the table.
  * @param {string} locationColumn The location column.
  * @param {string} where A filter for the layer.
- * @param {string} styleId The id of the map style to use from New look.
+ * @param {string} styleId The map style ID.
+ * @param {string} templateId The map info window template ID.
  * @return {string} The layer id.
  */
-Map.prototype.addLayer = function(tableId, locationColumn, where, styleId, templateId) {
+Map.prototype.addLayer = function(tableId, locationColumn, where, styleId,
+    templateId) {
   if (this.layerIds.length) {
     var layer = new Layer(tableId, locationColumn, where, styleId, templateId);
     layer.setMap(this.map);
@@ -175,12 +177,12 @@ Map.prototype.editMap = function() {
   // TODO: get the max zoom from the maxZoomService
   var zoom = parseInt(document.getElementById('map-zoom').value, 10);
   this.currentZoom = zoom >= 0 ? zoom : this.DEFAULT_ZOOM_;
-  this.map.setZoom(this.zoom);
- 
+  this.map.setZoom(this.zoom_);
+
   // Set the map's centerpoint
   var lat = parseFloat(document.getElementById('map-center-lat').value);
   var lng = parseFloat(document.getElementById('map-center-lng').value);
-  var center = new google.maps.LatLng(lat,lng);
+  var center = new google.maps.LatLng(lat, lng);
   this.map.setCenter(center);
 
   // Resize the map
@@ -278,7 +280,7 @@ Map.prototype.applyStyle = function(style) {
  * @return {google.maps.LatLng} The center of the map.
  */
 Map.prototype.getCenter = function() {
-  return this.center;
+  return this.center_;
 };
 
 /**
@@ -286,7 +288,7 @@ Map.prototype.getCenter = function() {
  * @param {google.maps.LatLng} center The center for the map.
  */
 Map.prototype.setCenter = function(center) {
-  this.center = center;
+  this.center_ = center;
 };
 
 /**
@@ -294,7 +296,7 @@ Map.prototype.setCenter = function(center) {
  * @return {number} The zoom of the map.
  */
 Map.prototype.getZoom = function() {
-  return this.zoom;
+  return this.zoom_;
 };
 
 /**
@@ -302,7 +304,7 @@ Map.prototype.getZoom = function() {
  * @param {number} zoom The new map zoom.
  */
 Map.prototype.setZoom = function(zoom) {
-  this.zoom = zoom;
+  this.zoom_ = zoom;
 };
 
 /**
@@ -310,7 +312,7 @@ Map.prototype.setZoom = function(zoom) {
  * @return {string} The mapTypeId of the map.
  */
 Map.prototype.getMapTypeId = function() {
-  return this.mapTypeId;
+  return this.mapTypeId_;
 };
 
 /**
@@ -318,7 +320,7 @@ Map.prototype.getMapTypeId = function() {
  * @param {string} mapTypeId The map type id of the map.
  */
 Map.prototype.setMapTypeId = function(mapTypeId) {
-  this.mapTypeId = mapTypeId;
+  this.mapTypeId_ = mapTypeId;
 };
 
 /**

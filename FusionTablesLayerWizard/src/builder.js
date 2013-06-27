@@ -15,7 +15,8 @@
  *  1| Download the closure library and compiler.jar helper files
  *  You'll have already downloaded the Closure library to set up
  *  your local editing environment.
- *  svn checkout http://closure-library.googlecode.com/svn/trunk/ closure-library
+ *  svn checkout http://closure-library.googlecode.com/svn/trunk/ \
+ *  closure-library
  *
  *  Download the closure.jar
  *  http://closure-compiler.googlecode.com/files/compiler-latest.zip
@@ -39,20 +40,20 @@
 
 goog.provide('Builder.start');
 
-goog.require('goog.dom');
-goog.require('goog.ui.Slider');
-goog.require('goog.ui.Component');
-goog.require('goog.ui.AnimatedZippy');
-goog.require('goog.ui.Zippy');
-goog.require('goog.ui.ZippyEvent');
-goog.require('goog.events');
-goog.require('goog.Uri');
 goog.require('Builder.controller');
 goog.require('Builder.form');
 goog.require('Builder.html');
 goog.require('Builder.layer');
 goog.require('Builder.map');
 goog.require('Builder.search');
+goog.require('goog.Uri');
+goog.require('goog.dom');
+goog.require('goog.events');
+goog.require('goog.ui.AnimatedZippy');
+goog.require('goog.ui.Component');
+goog.require('goog.ui.Slider');
+goog.require('goog.ui.Zippy');
+goog.require('goog.ui.ZippyEvent');
 
 
 /**

@@ -5,7 +5,7 @@
  *
  */
 
- goog.provide('Builder.html');
+goog.provide('Builder.html');
 
 /**
  * Html constructor.
@@ -62,11 +62,13 @@ Html.prototype.updateHtml = function() {
   textArea.push('</body>');
   textArea.push(this.newLineIndent(0));
   textArea.push('</html>');
+  textArea.push(this.newLineIndent(0));
   document.getElementById('html-code').value = textArea.join('');
 };
 
 /**
  * Construct the head HTML code.
+ * @return {Array.<string>} The array of strings with the header.
  */
 Html.prototype.head = function() {
   var textArea = [];
@@ -77,6 +79,7 @@ Html.prototype.head = function() {
 
 /**
  * Construct the style CSS code.
+ * @return {Array.<string>} The array of strings with the CSS.
  */
 Html.prototype.style = function() {
   var textArea = [];
@@ -88,6 +91,8 @@ Html.prototype.style = function() {
   textArea.push('px; height:');
   textArea.push(this.map.height);
   textArea.push('px; }');
+  textArea.push(this.newLineIndent(2));
+  textArea.push('.layer-wizard-search-label { font-family: sans-serif };');
   textArea.push(this.newLineIndent(1));
   textArea.push('</style>');
   return textArea;
@@ -95,6 +100,7 @@ Html.prototype.style = function() {
 
 /**
  * Construct the script include HTML code.
+ * @return {Array.<string>} The array of strings with script tags.
  */
 Html.prototype.scriptIncludes = function() {
   var textArea = [];
@@ -109,6 +115,7 @@ Html.prototype.scriptIncludes = function() {
 
 /**
  * Construct the JavaScript code.
+ * @return {Array.<string>} The array of strings with the code.
  */
 Html.prototype.script = function() {
   var textArea = [];
@@ -118,6 +125,7 @@ Html.prototype.script = function() {
   textArea.push(this.newLineIndent(2));
   textArea.push('var map;');
   for (var layerId in this.map.layers) {
+    layerId = this.readableLayerId(layerId);
     textArea.push(this.newLineIndent(2));
     textArea.push('var layer');
     textArea.push(layerId);
@@ -143,6 +151,7 @@ Html.prototype.script = function() {
 
 /**
  * Construct the map JavaScript code.
+ * @return {Array.<string>} The array of strings with the Maps API code.
  */
 Html.prototype.mapScript = function() {
   var textArea = [];
@@ -151,13 +160,13 @@ Html.prototype.mapScript = function() {
   textArea.push("document.getElementById('map-canvas'), {");
   textArea.push(this.newLineIndent(4));
   textArea.push('center: new google.maps.LatLng(');
-  textArea.push(this.map.center.lat());
+  textArea.push(this.map.getCenter().lat());
   textArea.push(', ');
-  textArea.push(this.map.center.lng());
+  textArea.push(this.map.getCenter().lng());
   textArea.push('),');
   textArea.push(this.newLineIndent(4));
   textArea.push('zoom: ');
-  textArea.push(this.map.zoom);
+  textArea.push(this.map.getZoom());
   var mapTypeId = this.map.mapTypes[this.map.map.getMapTypeId()];
   if (mapTypeId) {
     textArea.push(',');
@@ -172,6 +181,7 @@ Html.prototype.mapScript = function() {
 
 /**
  * Construct the map style JavaScript code.
+ * @return {Array.<string>} The array of strings with the map style code.
  */
 Html.prototype.mapStyle = function() {
   var styles = [];
@@ -248,25 +258,25 @@ Html.prototype.mapStyle = function() {
 
 /**
  * Construct the Fusion Tables Layer JavaScript code.
+ * @return {Array.<string>} The array of strings with the layer code.
  */
 Html.prototype.fusionTableLayers = function() {
   var textArea = [];
-  for (var i in this.map.layers) {
-    var layer = this.map.layers[i];
+  for (var layerId in this.map.layers) {
+    var layer = this.map.layers[layerId];
+    layerId = this.readableLayerId(layerId);
     textArea.push(this.newLineIndent(3));
-    textArea.push('layer')
-    textArea.push(i);
+    textArea.push('layer');
+    textArea.push(layerId);
     textArea.push(' = new google.maps.FusionTablesLayer({');
     textArea.push(this.newLineIndent(4));
     textArea.push('query: {');
     textArea.push(this.newLineIndent(5));
-    textArea.push('select: "\'');
-    textArea.push(layer.locationColumn);
-    textArea.push('\'",');
+    this.emitSelect(layer, textArea);
     textArea.push(this.newLineIndent(5));
-    textArea.push("from: '");
+    textArea.push('from: "');
     textArea.push(layer.tableId);
-    textArea.push("'");
+    textArea.push('"');
     if (layer.where) {
       textArea.push(',');
       textArea.push(this.newLineIndent(5));
@@ -298,49 +308,62 @@ Html.prototype.fusionTableLayers = function() {
 
 /**
  * Construct the Fusion Tables Layer search JavaScript code.
+ * @return {Array.<string>} The array of strings with the search code.
  */
 Html.prototype.searches = function() {
   var textArea = [];
-  for (var i in this.map.layers) {
-    var layer = this.map.layers[i];
+  for (var layerId in this.map.layers) {
+    var layer = this.map.layers[layerId];
+    layerId = this.readableLayerId(layerId);
     if (layer.search) {
       textArea.push(this.newLineIndent(2));
-      textArea.push('function changeMap')
-      textArea.push(i);
+      textArea.push('function changeMap');
+      textArea.push(layerId);
       textArea.push('() {');
       textArea.push(this.newLineIndent(3));
+      textArea.push('var whereClause');
+      if (layer.where) {
+        textArea.push(' = "' + layer.where + '"');
+      }
+      textArea.push(';');
+      textArea.push(this.newLineIndent(3));
       textArea.push('var searchString ');
-      textArea.push("= document.getElementById('search-string-");
-      textArea.push(i);
+      textArea.push("= document.getElementById('search-string");
+      textArea.push(layerId);
       textArea.push("').");
       textArea.push('value.replace(/\'/g, "\\\\\'");');
       textArea.push(this.newLineIndent(3));
+      textArea.push('if (searchString != \'--Select--\') {');
+      textArea.push(this.newLineIndent(4));
+      if (layer.where) {
+        textArea.push('whereClause += " AND ');
+      } else {
+        textArea.push('whereClause = "');
+      }
+      textArea.push("'" + layer.search.column + "'");
+      if (layer.search.type == 'text') {
+        textArea.push(' CONTAINS IGNORING CASE \'" + searchString + "\'"');
+      } else if (layer.search.type == 'select') {
+        textArea.push(' = \'" + searchString + "\'"');
+      }
+      textArea.push(';');
+
+      textArea.push(this.newLineIndent(3));
+      textArea.push('}');
+      textArea.push(this.newLineIndent(3));
       textArea.push('layer');
-      textArea.push(i);
+      textArea.push(layerId);
       textArea.push('.setOptions({');
       textArea.push(this.newLineIndent(4));
       textArea.push('query: {');
       textArea.push(this.newLineIndent(5));
-      textArea.push('select: "\'');
-      textArea.push(layer.locationColumn);
-      textArea.push('\'",');
+      this.emitSelect(layer, textArea);
       textArea.push(this.newLineIndent(5));
-      textArea.push('from: \'');
+      textArea.push('from: "');
       textArea.push(layer.tableId);
-      textArea.push('\',');
+      textArea.push('",');
       textArea.push(this.newLineIndent(5));
-      textArea.push('where: "\'');
-      textArea.push(layer.search.column);
-      if (layer.search.type == 'text') {
-        textArea.push('\' CONTAINS IGNORING CASE \'" + searchString + "\'');
-      } else if (layer.search.type == 'select') {
-        textArea.push('\' = \'" + searchString + "\'');
-      }
-      if (layer.where) {
-        textArea.push(' AND ');
-        textArea.push(layer.where);
-      }
-      textArea.push('"');
+      textArea.push('where: whereClause');
       textArea.push(this.newLineIndent(4));
       textArea.push('}');
       textArea.push(this.newLineIndent(3));
@@ -353,52 +376,73 @@ Html.prototype.searches = function() {
 };
 
 /**
+ * Adds the select clause, quoting the location column if required.
+ * @param {google.maps.FusionTablesLayer} layer The layer.
+ * @param {Array.<string>} textArea The array of strings to add the column to.
+ */
+Html.prototype.emitSelect = function(layer, textArea) {
+  textArea.push('select: "');
+  if (layer.locationColumn.match(/^col\d+(>>\d+)?$/)) {
+    // Column ID, no quoting needed
+    textArea.push(layer.locationColumn);
+  } else {
+    textArea.push("'" + layer.locationColumn + "'");
+  }
+  textArea.push('",');
+};
+
+/**
  * Construct the body of the HTML code.
+ * @return {Array.<string>} The array of strings with the search code.
  */
 Html.prototype.body = function() {
   var textArea = [];
   textArea.push(this.newLineIndent(2));
   textArea.push('<div id="map-canvas"></div>');
 
-  for (var i in this.map.layers) {
-    var layer = this.map.layers[i];
+  for (var layerId in this.map.layers) {
+    var layer = this.map.layers[layerId];
+    layerId = this.readableLayerId(layerId);
     var search = layer.search;
     if (search) {
       textArea.push(this.newLineIndent(2));
       textArea.push('<div style="margin-top: 10px;">');
       textArea.push(this.newLineIndent(3));
-      textArea.push('<label>');
+      textArea.push('<label class="layer-wizard-search-label">');
+      textArea.push(this.newLineIndent(4));
       textArea.push(search.label);
-      textArea.push('</label>');
+      textArea.push(this.newLineIndent(4));
       if (search.type == 'text') {
-        textArea.push('<input type="text" id="search-string-');
-        textArea.push(i);
+        textArea.push('<input type="text" id="search-string"');
+        textArea.push(layerId);
         textArea.push('">');
-        textArea.push(this.newLineIndent(3));
+        textArea.push(this.newLineIndent(4));
         textArea.push('<input type="button" onclick="changeMap');
-        textArea.push(i);
+        textArea.push(layerId);
         textArea.push('()" value="Search">');
       } else if (search.type == 'select') {
-        textArea.push(this.newLineIndent(3));
-        textArea.push('<select id="search-string-');
-        textArea.push(i);
+        textArea.push('<select id="search-string');
+        textArea.push(layerId);
         textArea.push('" ');
-        textArea.push('onchange="changeMap')
-        textArea.push(i);
+        textArea.push('onchange="changeMap');
+        textArea.push(layerId);
         textArea.push('(this.value);">');
-        textArea.push(this.newLineIndent(4));
-        textArea.push('<option value="">--Select--</option>');
-        for (var j = 0; j < search.options.length; j++) {
-          textArea.push(this.newLineIndent(4));
+        textArea.push(this.newLineIndent(5));
+        textArea.push('<option value="--Select--">--Select--</option>');
+        for (var iopt = 0; iopt < search.options.length; iopt++) {
+          textArea.push(this.newLineIndent(5));
           textArea.push('<option value="');
-          textArea.push(search.options[j]);
+          var value = search.options[iopt];
+          textArea.push(value);
           textArea.push('">');
-          textArea.push(search.options[j]);
+          textArea.push(value ? value : '(no value)');
           textArea.push('</option>');
         }
-        textArea.push(this.newLineIndent(3));
+        textArea.push(this.newLineIndent(4));
         textArea.push('</select>');
       }
+      textArea.push(this.newLineIndent(3));
+      textArea.push('</label> ');
       textArea.push(this.newLineIndent(2));
       textArea.push('</div>');
     }
@@ -408,7 +452,18 @@ Html.prototype.body = function() {
 };
 
 /**
- * Construct the script JavaScript code.
+ * Return the numeric layer ID prefixed with an underscore for readability.
+ * @param {string} layerId The maps layer ID, such as l2.
+ * @return {string} The layer ID.
+ */
+Html.prototype.readableLayerId = function(layerId) {
+  return '_' + layerId.substring(1);
+};
+
+/**
+ * Get a line starting with a newline indented to the requested level.
+ * @param {number} indent The number of indent levels, each of two spaces.
+ * @return {string} The indented line.
  */
 Html.prototype.newLineIndent = function(indent) {
   var indentation = new Array(indent + 1).join(this.INDENT_);

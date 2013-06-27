@@ -10,6 +10,8 @@
 /**
  * Controller constructor.
  * @constructor
+ * @param {Builder.Html} html The Html object for the generated code text area.
+ * @param {google.maps.Map} map The the generated code text area.
  */
 var Controller = function(html, map) {
   this.map = map;
@@ -22,7 +24,7 @@ var Controller = function(html, map) {
  * @type {number}
  * @private
  */
-Controller.prototype.numLayerForms = 0;
+Controller.prototype.numLayerForms_ = 0;
 
 /**
  * The maximum number of layer forms that can be added.
@@ -37,14 +39,21 @@ Controller.prototype.MAX_LAYER_FORMS_ = 5;
  */
 Controller.prototype.initialize = function() {
   var that = this;
+
+  gapi.client.load('fusiontables', 'v1', function() {
+    gapi.client.setApiKey('AIzaSyAm9yWCV7JPCTHCJut8whOjARd7pwROFDQ');
+  });
+
   var layerId = this.constructLayerForm();
   this.layerFormListeners(layerId);
 
   // Initialize form inputs
   document.getElementById('map-width').value = this.map.DEFAULT_WIDTH_;
   document.getElementById('map-height').value = this.map.DEFAULT_HEIGHT_;
-  document.getElementById('map-center-lat').value = this.map.defaultCenter.lat();
-  document.getElementById('map-center-lng').value = this.map.defaultCenter.lng();
+  document.getElementById('map-center-lat').value =
+      this.map.defaultCenter_.lat();
+  document.getElementById('map-center-lng').value =
+      this.map.defaultCenter_.lng();
   document.getElementById('map-zoom').value = this.map.DEFAULT_ZOOM_;
 
   // Initialize slider
@@ -127,6 +136,7 @@ Controller.prototype.initialize = function() {
 
 /**
  * Update the DOM, adding a new layer form.
+ * @return {string} The next layer ID.
  */
 Controller.prototype.constructLayerForm = function() {
   var nextLayerId = this.map.layerIds[0];
@@ -151,7 +161,7 @@ Controller.prototype.constructLayerForm = function() {
   var publishUrlLabel = this.createLabel('Embed link');
   var publishUrlInput = this.createTextInput('publish-url-' + nextLayerId);
   var publishUrlFormElement =
-    this.createFormElement([publishUrlLabel, publishUrlInput]);
+      this.createFormElement([publishUrlLabel, publishUrlInput]);
   zipContentEmbedLink.appendChild(publishUrlFormElement);
   var publishUrlNote = this.createNote('Copy this from Tools > Publish.');
   zipContentEmbedLink.appendChild(publishUrlNote);
@@ -180,7 +190,7 @@ Controller.prototype.constructLayerForm = function() {
 
   // Location column
   var locationColumnLabel = this.createLabel('Location Column');
-  var locationColumnOptions = [{ 'value': '', 'innerHtml': '--Select--' }];
+  var locationColumnOptions = [{ 'value': '', 'text': '--Select--' }];
   var locationColumnInput = this.createSelect(
       'location-column-' + nextLayerId, locationColumnOptions);
   locationColumnInput.disabled = true;
@@ -229,9 +239,10 @@ Controller.prototype.constructLayerForm = function() {
 
   // Search feature
   var addSearchLabel = this.createLabel('Add a search feature');
-  var searchColumnOptions = [{ 'value': '', 'innerHtml': '--Select--' },
-      { 'value': 'text-' + nextLayerId, 'innerHtml': 'Text-based search' },
-      { 'value': 'select-' + nextLayerId, 'innerHtml': 'Select-based search' }];
+  var searchColumnOptions = [
+      { 'value': '', 'text': '--Select--' },
+      { 'value': 'text-' + nextLayerId, 'text': 'Text-based search' },
+      { 'value': 'select-' + nextLayerId, 'text': 'Select-based search' }];
   var addSearchInput = this.createSelect('add-feature-' + nextLayerId,
       searchColumnOptions);
   var addSearchFormElement = this.createFormElement(
@@ -253,7 +264,7 @@ Controller.prototype.constructLayerForm = function() {
 
   // Text search column
   var textSearchColumnLabel = this.createLabel('Column to query:');
-  var textSearchColumnOptions = [{ 'value': '', 'innerHtml': '--Select--' }];
+  var textSearchColumnOptions = [{ 'value': '', 'text': '--Select--' }];
   var textSearchColumnInput = this.createSelect(
       'text-query-column-' + nextLayerId, textSearchColumnOptions);
   textSearchColumnInput.disabled = true;
@@ -288,7 +299,7 @@ Controller.prototype.constructLayerForm = function() {
 
   // Select search column
   var selectSearchColumnLabel = this.createLabel('Column to query:');
-  var selectSearchColumnOptions = [{ 'value': '', 'innerHtml': '--Select--' }];
+  var selectSearchColumnOptions = [{ 'value': '', 'text': '--Select--' }];
   var selectSearchColumnInput = this.createSelect(
       'select-query-column-' + nextLayerId, selectSearchColumnOptions);
   selectSearchColumnInput.disabled = true;
@@ -312,24 +323,25 @@ Controller.prototype.constructLayerForm = function() {
   // Zippy
   var zipEmbedLink = new goog.ui.AnimatedZippy(
       'zHeaderEmbedLink-' + nextLayerId,
-      'zContentEmbedLink-' + nextLayerId,true);
+      'zContentEmbedLink-' + nextLayerId, true);
   var zipOldFashionedWay = new goog.ui.AnimatedZippy(
       'zHeaderOldFashionedWay-' + nextLayerId,
       'zContentOldFashionedWay-' + nextLayerId, false);
   goog.events.listen(zipOldFashionedWay,
       goog.ui.Zippy.Events.TOGGLE,
-      function (event) {
+      function(event) {
         zipEmbedLink.setExpanded(!event.expanded);
-        }
-      );
+      }
+  );
 
-  this.numLayerForms++;
+  this.numLayerForms_++;
   return nextLayerId;
 };
 
 /**
  * Create a Form Element.
  * @param {Object} elements The list of DOM elements to add.
+ * @return {element} The new form element.
  */
 Controller.prototype.createFormElement = function(elements) {
   var formElement = document.createElement('div');
@@ -343,6 +355,7 @@ Controller.prototype.createFormElement = function(elements) {
 /**
  * Create a label DOM element.
  * @param {string} innerHtml The text for the label.
+ * @return {element} The new label element.
  */
 Controller.prototype.createLabel = function(innerHtml) {
   var label = document.createElement('label');
@@ -353,6 +366,7 @@ Controller.prototype.createLabel = function(innerHtml) {
 /**
  * Create a note DOM element.
  * @param {string} innerHtml The text for the label.
+ * @return {element} The new note element.
  */
 Controller.prototype.createNote = function(innerHtml) {
   var note = document.createElement('p');
@@ -365,6 +379,7 @@ Controller.prototype.createNote = function(innerHtml) {
 /**
  * Create a text input box.
  * @param {string} id The id of the text box.
+ * @return {element} The new text element.
  */
 Controller.prototype.createTextInput = function(id) {
   var textInput = document.createElement('input');
@@ -378,15 +393,16 @@ Controller.prototype.createTextInput = function(id) {
  * Create a select menu.
  * @param {string} id The id of the select menu.
  * @param {Object} options List of options for the select menu.
+ * @return {element} The new select element.
  */
 Controller.prototype.createSelect = function(id, options) {
   var select = document.createElement('select');
   select.id = id;
   select.className = 'right';
-  for (var i in options) {
+  for (var iopt = 0; iopt < options.length; ++iopt) {
     var option = document.createElement('option');
-    option.value = options[i]['value'];
-    option.innerHTML = options[i]['innerHtml'];
+    option.value = options[iopt].value;
+    option.text = options[iopt].text;
     select.appendChild(option);
   }
   return select;
@@ -396,6 +412,7 @@ Controller.prototype.createSelect = function(id, options) {
  * Create a button.
  * @param {string} id The id of the button.
  * @param {string} value The value of the button.
+ * @return {element} The new button.
  */
 Controller.prototype.createButton = function(id, value) {
   var button = document.createElement('input');
@@ -415,7 +432,8 @@ Controller.prototype.layerFormListeners = function(nextLayerId) {
   // On blur table id field: fill the select columns
   google.maps.event.addDomListener(
       document.getElementById('table-id-' + nextLayerId), 'blur', function() {
-        var menus = [document.getElementById('location-column-' + nextLayerId),
+        var menus = [
+            document.getElementById('location-column-' + nextLayerId),
             document.getElementById('text-query-column-' + nextLayerId),
             document.getElementById('select-query-column-' + nextLayerId)];
         that.fillSelectColumns(menus, this.value);
@@ -430,43 +448,44 @@ Controller.prototype.layerFormListeners = function(nextLayerId) {
     var embedLink = {};
     embedLink.url = Form.checkEmbedForm(nextLayerId);
 
-  // Query parameter
+    // Query parameter
     embedLink.query = embedLink.url.getParameterValue('q');
 
-  // Query parameter: WHERE clause
+    // Query parameter: WHERE clause
     if (embedLink.query.indexOf('where') != -1) {
-    var filter = embedLink.query.substring(6 + embedLink.query.indexOf('where'));
-    embedLink.where = goog.string.urlDecode(filter);
+      var filter = embedLink.query.substring(
+          6 + embedLink.query.indexOf('where'));
+      embedLink.where = goog.string.urlDecode(filter);
     }
 
-  // Query parameter: 40-char DocID
+    // Query parameter: 40-char DocID
     var ifrom = embedLink.query.indexOf('from');
     embedLink.docId = embedLink.query.substring(5 + ifrom, 45 + ifrom);
     // Fill in old-fashioned form and trigger event to
     // populate select column menus for search feature forms
     document.getElementById('table-id-' + nextLayerId).value = embedLink.docId;
-    google.maps.event.trigger(document.getElementById('table-id-' + nextLayerId),
-                'blur' );
-  // Location column parameter
-  // TODO: add error checking for missing parameters
+    google.maps.event.trigger(document.getElementById('table-id-' +
+        nextLayerId), 'blur');
+    // Location column parameter
+    // TODO: add error checking for missing parameters
     embedLink.locationColumnId = embedLink.url.getParameterValue('l');
 
-  // Optional parameters
+    // Optional parameters
     embedLink.lat = parseFloat(embedLink.url.getParameterValue('lat'));
     embedLink.lng = parseFloat(embedLink.url.getParameterValue('lng'));
     embedLink.styleId = embedLink.url.getParameterValue('y');
     embedLink.templateId = embedLink.url.getParameterValue('tmplt');
-    embedLink.zoom = parseInt(embedLink.url.getParameterValue('z'),10);
+    embedLink.zoom = parseInt(embedLink.url.getParameterValue('z'), 10);
 
     var layerId =
-      that.map.addLayer(embedLink.docId, embedLink.locationColumnId,
-      embedLink.where, embedLink.styleId, embedLink.templateId);
+        that.map.addLayer(embedLink.docId, embedLink.locationColumnId,
+        embedLink.where, embedLink.styleId, embedLink.templateId);
     // capture existing map parameters
     document.getElementById('map-zoom').value = embedLink.zoom;
     document.getElementById('map-center-lat').value = embedLink.lat;
     document.getElementById('map-center-lng').value = embedLink.lng;
-    if (embedLink.zoom >=0 ) {
-    that.map.setZoom(embedLink.zoom);
+    if (embedLink.zoom >= 0) {
+      that.map.setZoom(embedLink.zoom);
     }
     that.map.setCenter(new google.maps.LatLng(embedLink.lat, embedLink.lng));
     that.map.editMap();
@@ -474,13 +493,13 @@ Controller.prototype.layerFormListeners = function(nextLayerId) {
 
     this.style.display = 'None';
     document.getElementById('reset-layer-' + nextLayerId).style.display =
-      'inline';
+        'inline';
 
-    if (that.numLayerForms < that.MAX_LAYER_FORMS_) {
-    document.getElementById('add-layer').style.display = 'inline';
+    if (that.numLayerForms_ < that.MAX_LAYER_FORMS_) {
+      document.getElementById('add-layer').style.display = 'inline';
     }
-  } else  // Use specific fields to construct layer, if no embed link
-   if (Form.checkLayerForm(nextLayerId)) {
+  } else if (Form.checkLayerForm(nextLayerId)) {
+    // Use specific fields to construct layer, if no embed link
     var tableId = document.getElementById('table-id-' + nextLayerId).value;
     var locationColumn =
       document.getElementById('location-column-' + nextLayerId).value;
@@ -488,14 +507,14 @@ Controller.prototype.layerFormListeners = function(nextLayerId) {
     var styleId = document.getElementById('style-id-' + nextLayerId).value;
     var templateId =
         document.getElementById('template-id-' + nextLayerId).value;
-      var layerId = that.map.addLayer(tableId, locationColumn, where,
-                                      styleId, templateId);
+    var layerId = that.map.addLayer(tableId, locationColumn, where,
+        styleId, templateId);
     that.html.updateHtml();
     this.style.display = 'None';
     document.getElementById('reset-layer-' + nextLayerId).style.display =
-      'inline';
-    if (that.numLayerForms < that.MAX_LAYER_FORMS_) {
-    document.getElementById('add-layer').style.display = 'inline';
+        'inline';
+    if (that.numLayerForms_ < that.MAX_LAYER_FORMS_) {
+      document.getElementById('add-layer').style.display = 'inline';
     }
   }
   });
@@ -532,11 +551,12 @@ Controller.prototype.layerFormListeners = function(nextLayerId) {
   google.maps.event.addDomListener(
       document.getElementById('add-text-query-' + nextLayerId), 'click',
           function() {
-            that.addSearch('text', nextLayerId);
-            this.style.display = 'None';
-            var id = 'reset-text-query-' + nextLayerId;
-            document.getElementById(id).style.display = 'inline';
-            that.html.updateHtml();
+            if (that.addSearch('text', nextLayerId)) {
+              this.style.display = 'None';
+              var id = 'reset-text-query-' + nextLayerId;
+              document.getElementById(id).style.display = 'inline';
+              that.html.updateHtml();
+            }
           });
 
   // Remove text search button click: Remove text search from layer.
@@ -583,31 +603,37 @@ Controller.prototype.layerFormListeners = function(nextLayerId) {
  * @param {string} tableId The id of the table.
  */
 Controller.prototype.fillSelectColumns = function(menus, tableId) {
-  var query = 'SELECT * FROM ' + tableId + ' LIMIT 1';
   var that = this;
-  this.runQuery(query, 'locationColumnMenu', function(response) {
+
+  var request = gapi.client.fusiontables.table.get({'tableId': tableId});
+  request.execute(function(response) {
+    if (response.error) {
+      alert('Unable to get table columns: ' + response.error.message +
+          ' (' + response.error.code + ')');
+      return;
+    }
+
     // First remove the current options from and enable each menu.
-    for (var i in menus) {
-      if (menus[i].hasChildNodes()) {
-        while (menus[i].childNodes.length > 2) {
-          menus[i].removeChild(menus[i].lastChild);
+    for (var imenu in menus) {
+      if (menus[imenu].hasChildNodes()) {
+        while (menus[imenu].childNodes.length > 2) {
+          menus[imenu].removeChild(menus[imenu].lastChild);
         }
       }
-      menus[i].disabled = false;
+      menus[imenu].disabled = false;
     }
 
     // Then fill the menus in with the new values
-    for (var key in response['table']['cols']) {
-      var value = response['table']['cols'][key];
-
+    for (var icol = 0; icol < response.columns.length; icol++) {
+      var column = response.columns[icol];
+      var columnName = column.name;
       var locationOption = document.createElement('option');
-      locationOption.value = value;
-      locationOption.innerHTML = value;
+      locationOption.value = columnName;
+      locationOption.text = columnName;
       menus[0].appendChild(locationOption);
-
-      for (var i = 1; i < menus.length; i++) {
+      for (var imenu = 1; imenu < menus.length; imenu++) {
         var option = locationOption.cloneNode(true);
-        menus[i].appendChild(option);
+        menus[imenu].appendChild(option);
       }
     }
   });
@@ -617,29 +643,36 @@ Controller.prototype.fillSelectColumns = function(menus, tableId) {
  * Initialize addition of the search under the map.
  * @param {string} type The type of query, either text or select.
  * @param {number} layerId The layer id.
+ * @return {boolean} True if the search elements could be added.
  */
 Controller.prototype.addSearch = function(type, layerId) {
   var layer = this.map.layers[layerId];
-  var label = document.getElementById(type + '-query-label-' + layerId).value;
+  var labelElement = document.getElementById(type + '-query-label-' + layerId);
   var column = document.getElementById(type + '-query-column-' + layerId).value;
-  layer.addSearch(type, label, column);
 
-  var addSearchDom = function(checkForm, addSearch, eventType, element) {
+  var addSearchDom = function(checkForm, addSearch, eventType, menuElement) {
     if (checkForm(layerId)) {
-      var domElement = addSearch(label, column, layerId);
+      layer.addSearch(type, labelElement.value, column);
+      var domElement = addSearch(labelElement.value, column, layerId);
       google.maps.event.addDomListener(domElement, eventType, function() {
-        var value = document.getElementById(element).value;
+        var value = document.getElementById(menuElement).value;
         layer.query(value);
       });
+      return true;
     }
-  }
+    return false;
+  };
 
   if (type == 'text') {
-    addSearchDom(Form.checkTextForm, this.addTextSearch, 'click',
-        'text-search-' + layerId);
+    if (!addSearchDom(Form.checkTextForm, this.addTextSearch, 'click',
+        'text-search-' + layerId)) {
+      return false;
+    }
   } else if (type == 'select') {
-    addSearchDom(Form.checkSelectForm, this.addSelectSearch, 'change',
-        'select-search-' + layerId);
+    if (!addSearchDom(Form.checkSelectForm, this.addSelectSearch, 'change',
+        'select-search-' + layerId)) {
+      return false;
+    }
 
     // Get the select menu options.
     var query = [];
@@ -656,15 +689,22 @@ Controller.prototype.addSearch = function(type, layerId) {
     query.push("'");
 
     var that = this;
-    this.runQuery(query.join(''), 'selectMenuOptions', function(response) {
-      layer.search.options =
-          that.selectMenuOptions(response, layerId);
-      // Need to run this here, since the call is asynch
+    var request = gapi.client.fusiontables.query.sqlGet(
+        {'sql': query.join('')});
+    request.execute(function(response) {
+      if (response.error) {
+        alert('Unable to run query: ' + response.error.message +
+              ' (' + response.error.code + ')');
+        return;
+      }
+      layer.search.options = that.selectMenuOptions(response, layerId);
+      // Need to run this here, since the call is async
       that.html.updateHtml();
     });
   }
   var addFeatureMenu = document.getElementById('add-feature-' + layerId);
   addFeatureMenu.disabled = addFeatureMenu.disabled ? false : true;
+  return true;
 };
 
 /**
@@ -719,8 +759,8 @@ Controller.prototype.addSelectSearch = function(label, column, layerId) {
   select.setAttribute('disabled', 'true');
 
   var option = document.createElement('option');
-  option.setAttribute('value', '');
-  option.innerHTML = '--Select--';
+  option.setAttribute('value', '--Select--');
+  option.text = '--Select--';
   select.appendChild(option);
 
   div.appendChild(searchLabel);
@@ -741,32 +781,16 @@ Controller.prototype.addSelectSearch = function(label, column, layerId) {
 Controller.prototype.selectMenuOptions = function(response, layerId) {
   var selectMenu = document.getElementById('select-search-' + layerId);
   var searchOptions = [];
-  for (var i = 0; i < response['table']['rows'].length; i++) {
-    var rowValue = response['table']['rows'][i][0];
+  for (var irow = 0; irow < response.rows.length; irow++) {
+    var rowValue = response.rows[irow][0];
     var option = document.createElement('option');
     option.value = rowValue;
-    option.innerHTML = rowValue;
+    option.text = rowValue ? rowValue : '(no value)';
     selectMenu.appendChild(option);
     searchOptions.push(rowValue);
   }
   selectMenu.disabled = false;
   return searchOptions;
-};
-
-/**
- * Run a jsonp query to Fusion Tables.
- * @param {string} query A Fusion Table query.
- * @param {string} callbackName Callback function name.
- * @param {Function} callback Callback function.
- */
-Controller.prototype.runQuery = function(query, callbackName, callback) {
-  query = escape(query);
-  var script = document.createElement('script');
-  script.setAttribute('src',
-      'https://www.google.com/fusiontables/api/query?sql=' + query +
-      '&jsonCallback=' + callbackName);
-  window[callbackName] = callback;
-  document.body.appendChild(script);
 };
 
 /**
@@ -795,5 +819,5 @@ Controller.prototype.removeLayerForm = function(layerId) {
     }
   }
   document.getElementById('layer-forms').removeChild(layerForm);
-  this.numLayerForms--;
+  this.numLayerForms_--;
 };
