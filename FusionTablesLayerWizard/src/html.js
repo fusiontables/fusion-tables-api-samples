@@ -413,7 +413,7 @@ Html.prototype.body = function() {
       textArea.push(search.label);
       textArea.push(this.newLineIndent(4));
       if (search.type == 'text') {
-        textArea.push('<input type="text" id="search-string"');
+        textArea.push('<input type="text" id="search-string');
         textArea.push(layerId);
         textArea.push('">');
         textArea.push(this.newLineIndent(4));
