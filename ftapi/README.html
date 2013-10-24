@@ -72,16 +72,19 @@ on your behalf.
 <ol>
 <li>
 Select or create a project from the
-<a href="https://code.google.com/apis/console">API console</a>.
-Start with the Services page, which is linked from a navigation menu on the
-left, and enable Fusion Tables API. From the API Access page create or
-select an OAuth 2.0 client ID for an "installed application". When creating
-a new client, you will be prompted for some "branding information" that
-helps style the OAuth authorization page.
+<a href="https://cloud.google.com/console/start/api?id=fusiontables">cloud console</a>.
+Register a new Native application.
 </li>
 <li>
-Edit the file <code>credentials.sh</code> to supply the values from the console's API
-Access page for CLIENT_ID, CLIENT_SECRET, and API_KEY.
+Edit the file <code>credentials.sh</code> to supply the values for CLIENT_ID
+and CLIENT_SECRET. One way to accomplish that is to click "Download JSON" and
+process it like so:
+<pre>
+cat $(ls -t ~/Downloads/client_secret*.json | head -1) \
+  | sed -e 's/[{},]/\n/g' -e 's/":"/=/g' -e 's/"//g' \
+  | sed -e 's/client_id/CLIENT_ID/' -e 's/client_secret/CLIENT_SECRET/' \
+  | grep CLIENT_ > credentials.sh
+</pre>
 </li>
 <li>
 Execute <code>RUN_ME_FIRST.sh</code>, which opens a browser where you grant the
@@ -264,7 +267,6 @@ the old one expires. A working <code>credentials.sh</code> file looks something 
 <pre>
  CLIENT_ID=148678966448.apps.googleusercontent.com
  CLIENT_SECRET=YvV6DmasdfghPDaNkOvdcKUa
- API_KEY=AIzaSasdfghjklvIbuyLXr1PT0cPXJavh9CLQxVg
  refresh_token="1/FaOigPi4Gasdfghjkl5eSesDqw304EoI45YgaT65UFAM"
  access_token="ya29.AHES6Zasdfghjkl0KkTMM6ZtY-5_BcM74rwcSQrpp8NIEvNI"
  expires_in=3600

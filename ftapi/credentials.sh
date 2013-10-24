@@ -4,4 +4,3 @@
 # of the Google API console (https://code.google.com/apis/console).
 CLIENT_ID=
 CLIENT_SECRET=
-API_KEY=

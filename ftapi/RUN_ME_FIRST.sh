@@ -14,7 +14,7 @@ source common.sh
 source credentials.sh
 chmod 600 credentials.sh
 
-until [[ -n "$CLIENT_ID" && -n "$CLIENT_SECRET" && -n "$API_KEY" ]]; do
+until [[ -n "$CLIENT_ID" && -n "$CLIENT_SECRET" ]]; do
   cat <<EOF
 Please populate the credentials.sh file based on values from the Google
 API console as described in README.html. The initial file will look something
@@ -22,7 +22,15 @@ like:
 
 CLIENT_ID=148678966448.apps.googleusercontent.com
 CLIENT_SECRET=YvV6DmasdfghPDaNkOvdcKUa
-API_KEY=AIzaSasdfghjklvIbuyLXr1PT0cPXJavh9CLQxVg
+
+One way to accomplish this, would be to click "Download JSON" on the page for
+the Native regsitered app. Then process the downloaded JSON:
+
+cat $(ls -t ~/Downloads/client_secret*.json | head -1) \
+  | sed -e 's/[{},]/\n/g' -e 's/":"/=/g' -e 's/"//g' \
+  | sed -e 's/client_id/CLIENT_ID/' -e 's/client_secret/CLIENT_SECRET/' \
+  | grep CLIENT_ > credentials.sh
+
 EOF
   read -p "Hit enter to browse to Google API console"
   browse https://code.google.com/apis/console
@@ -37,9 +45,8 @@ function oauth_get_initial_tokens() {
 
 until grep -q access_token credentials.sh; do
     cat <<EOF
-The file credentials.sh should now contain API_KEY, CLIENT_ID, and
-CLIENT_SECRET for some API project. Next we add OAUTH tokens specific to this
-"installed application".
+The file credentials.sh should now contain CLIENT_ID and CLIENT_SECRET for some
+API project. Next we add OAUTH tokens specific to this "installed application".
 EOF
     read -p "Hit enter to request an OAUTH code and enter it at the next prompt"
 
