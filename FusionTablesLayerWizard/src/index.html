@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Copyright (c) 2012 Google Inc.
+  Copyright (c) 2012-2014 Google Inc.
 -->
 <html>
   <head>
@@ -12,13 +12,15 @@
     <link rel="stylesheet" href="style.css" type="text/css"></link>
     <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
     <script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
-    <script src="builder_compiled.js"></script>
 
-<!-- To set up a working local environment, download the Closure library with
+<!--
+To set up a working local environment, download the Closure library with
 svn checkout http://closure-library.googlecode.com/svn/trunk/ closure-library
-
-Then comment out the "builder_compiled.js" line above and uncomment the following:
-
+Then comment out the "builder_compiled.js" line below and uncomment the script
+tags below it.
+-->
+    <script src="builder_compiled.js"></script>
+<!--
     <script type="text/javascript" src="../../closure-library/closure/goog/base.js"></script>
     <script type="text/javascript" src="controller.js"></script>
     <script type="text/javascript" src="form.js"></script>
@@ -27,7 +29,9 @@ Then comment out the "builder_compiled.js" line above and uncomment the followin
     <script type="text/javascript" src="map.js"></script>
     <script type="text/javascript" src="search.js"></script>
     <script type="text/javascript" src="builder.js"></script>
+-->
 
+<!--
 See builder.js for instructions on rebuilding builder_compiled.js.
 
 For code reviews, you can use Rietveld:

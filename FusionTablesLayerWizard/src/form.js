@@ -36,7 +36,6 @@ Form.checkEmbedForm = function(layerNum) {
     alert('Link or code does not specify an embedded map: no viz=MAP found.');
     return null;
   }
-
   return new goog.Uri(link);
 };
 

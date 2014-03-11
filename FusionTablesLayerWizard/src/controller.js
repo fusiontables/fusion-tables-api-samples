@@ -452,15 +452,26 @@ Controller.prototype.layerFormListeners = function(nextLayerId) {
     embedLink.query = embedLink.url.getParameterValue('q');
 
     // Query parameter: WHERE clause
-    if (embedLink.query.indexOf('where') != -1) {
-      var filter = embedLink.query.substring(
-          6 + embedLink.query.indexOf('where'));
+    var wherePos = embedLink.query.indexOf('where');
+    if (wherePos != -1) {
+      var filter = embedLink.query.substring('where'.length + wherePos);
       embedLink.where = goog.string.urlDecode(filter);
     }
 
-    // Query parameter: 40-char DocID
-    var ifrom = embedLink.query.indexOf('from');
-    embedLink.docId = embedLink.query.substring(5 + ifrom, 45 + ifrom);
+    // Query parameter: document ID
+    var fromPos = embedLink.query.indexOf('from');
+    if (fromPos == -1) {
+      alert('Query has no "from" keyword: ' + embedLink.query);
+      return;
+    }
+    var docIdStartPos = fromPos + 'from '.length;
+    var docIdEndPos = embedLink.query.length;
+    if (wherePos != -1) {
+      docIdEndPos = wherePos - docIdStartPos;
+    }
+    embedLink.docId = embedLink.query.substring(docIdStartPos,
+        docIdStartPos + docIdEndPos).trim();
+
     // Fill in old-fashioned form and trigger event to
     // populate select column menus for search feature forms
     document.getElementById('table-id-' + nextLayerId).value = embedLink.docId;
