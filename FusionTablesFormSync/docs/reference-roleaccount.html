@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Synchronizing Fusion Tables with Google Forms</title>
+    <link rel="stylesheet" type="text/css" href="../../util/reference_style.css"></link>
+  </head>
+  <body>
+    <div id="gc-container">
+      <h1>
+        Synchronizing a Google Form with a Fusion Table
+      </h1>
+      <p>
+        With a simple script, you can set up a Google Form that your users
+        can use to input data to a Fusion Table. The script takes advantage
+        of <a href="http://code.google.com/googleapps/appsscript/">Google's
+        AppsScript tool</a> to transfer new form input into your table.
+      </p>
+      <section id="toc">
+        <h2>
+          Table of Contents
+        </h2>
+        <ul>
+          <li>
+            <a href="#begin">Before you begin</a>
+          </li>
+          <li>
+            Steps
+            <ol>              
+              <li>
+                <a href="#createForm">Create your form, spreadsheet, and Fusion Table</a>
+              </li>
+              <li>
+                <a href="#script">Set up the script</a>
+              </li>
+              <li>
+                <a href="#send">Send the form to your users</a>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a href="#trouble">Troubleshooting</a>
+          </li>
+        </ul>
+      </section>
+      <section id="begin">
+        <h2>
+          Before you begin
+        </h2>
+        <p>
+          For security reasons, make sure you have a "role"
+          gmail account to use to complete these instructions. A role account is
+          an account that is <b>not</b> your personal or work email address, but
+          one that is created for a specific task. Your password will be
+          shown in clear in the Script Editor, so make sure you use a role
+          account to run this script.
+        </p>
+        <p>
+          If you don't have a role account,
+          <a href="https://accounts.google.com/NewAccount">create one now</a>.
+        </p>
+        <p>
+          Plan out your data. If you are collecting
+          <a href="http://code.google.com/apis/fusiontables/docs/developers_guide.html#Geo">geographic
+          data</a> that contains a street address such as &quot;1600
+          Amphitheatre Parkway, MV, 94043&quot; or a text location string such
+          as &quot;Yosemite Park&quot; and you need Fusion Tables to geocode
+          them for you, there are some additional steps to follow (noted below).
+        </p>
+        <p>
+          Also note that once you have started collecting data, you can not
+          make any changes to the form or Fusion Table.
+        </p>
+      </section>
+      <section id="createForm">
+      <section id="instructions">
+        <section id="create">
+          <h2>
+            Create your form, spreadsheet, and Fusion Table
+          </h2>
+          <ol class="doublespace">
+            <li>
+              From <a href="https://drive.google.com">Google Drive</a> click
+              <strong>Create &gt; Form</strong> to create a new form. Set up your desired form questions
+              and give it a useful title.
+            </li>
+            <li>
+              Click <b>Choose response destination</b> from the toolbar at the top of the form editor.
+            </li>
+            <li>
+              From the resulting dialog, click the <b>Create</b> button to send the form
+              responses to a new spreadsheet.
+            </li>
+            <li>Back on the <a href="https://drive.google.com">Google Drive</a> page click on the
+              newly created spreadsheet. Note that the form automatically creates a Timestamp column.
+            </li>
+            <li>
+              From Drive click <strong>Create &gt; Table (Experimental)</strong> to create a new Fusion Table.
+              <div class="termsbox">
+                If you don't see that choice:
+                <ol>
+                  <li>
+                    Click <b>Connect more apps</b> at the bottom of the list
+                  </li>
+                  <li>
+                    Type "fusion tables" in the search box followed by the Enter key.
+                  </li>
+                  <li>
+                    Click the blue <b>+ Connect</b> button to add the app.
+                  </li>
+                  <li>
+                    You should see a dialog box saying "Google Tables was connected to Google Drive."
+                    Click the OK button to continue.
+                  </li>
+                </ol>
+                <p>
+                  If you can't find Fusion Tables in the list of apps, try these steps:
+                  <a href="https://support.google.com/fusiontables/answer/2920039">Fix:
+                    Not in Google Drive menus</a>.
+                </p>
+              </div>
+            </li>
+            <li>
+              In the "Import new table" dialog box, select Google Spreadsheets in the left-hand column.
+              Select your spreadsheet from the list and import.
+            </li>
+            <li>
+              If you collect location data, choose <strong>Edit &gt; Add column</strong> in the
+              table UI to include a column (Type: location) to hold your geocoded coordinates.
+            </li>
+          </ol>
+        </section>
+        <section id="script">
+          <h2>
+            Set up the script
+          </h2>
+          <ol class="doublespace">
+            <li>
+              Return to the form response spreadsheet and click <b>Tools &gt; Script editor...</b>
+              to bring up the Apps Script project window.
+            </li>
+            <li>
+              You may see an dialog entitled "Google Apps Script" that asks what to create a script for.
+              If so, select "Blank Project".
+            </li>
+            <li>
+              Set up your form's properties.
+              <ol type="a" class="doublespace">
+                <li>
+                  Click <b>File &gt; Project properties</b>. The first time
+                  you choose this command, the Rename Project dialog box is
+                  displayed. After that, the main project properties dialog
+                  box is displayed.
+                </li>
+                <li>
+                  Enter a name for your project, such as "FT Form." This
+                  displays the Project Properties dialog box.
+                </li>
+                <li>
+                  Click the <b>Project properties</b> tab.
+                </li>
+                <li>
+                  Click <b>+ Add row</b> to start adding your custom properties.
+                  This displays a row with &quot;(name)&quot; and &quot;(value)&quot; placeholders.
+                  <p>
+                    Add each of the following rows, replacing the name and value placeholders:
+                  </p>
+                  <table border="1" cellspacing="0" cellpadding="3">
+                    <thead>
+                      <tr>
+                        <th width="110">
+                          Name
+                        </th>
+                        <th width="291">
+                          Value to use
+                        </th>
+                        <th width="473">
+                          Notes
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          username
+                        </td>
+                        <td>
+                          The username of the account that owns the table.
+                        </td>
+                        <td>
+                          Use a role account. This does not work with gmail
+                          accounts that have 2-step verification enabled.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          password
+                        </td>
+                        <td>
+                          The password of the account that owns the table.
+                        </td>
+                        <td>
+                          This shows up in clear, so use a role account.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          docid
+                        </td>
+                        <td>
+                          The identifier of your table.
+                        </td>
+                        <td>
+                          To find this value, select <b>File &gt; About</b> in the table menu.
+                          Copy the value next to <b>Encrypted id</b>.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p class="topmargin">
+                    If you collect  location data, also add these properties:
+                  </p>
+                  <table border="1" cellspacing="0" cellpadding="3">
+                    <thead>
+                      <tr>
+                        <th width="110">
+                          Name
+                        </th>
+                        <th width="291">
+                          Value to use
+                        </th>
+                        <th width="473">
+                          Notes
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          addressColumn
+                        </td>
+                        <td>
+                          The exact name of the column in your table that
+                          contains the address. Do not use quotes.
+                        </td>
+                        <td>
+                          If your data is already geocoded, you do not need
+                          this property.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          latlngColumn
+                        </td>
+                        <td>
+                          The exact name of the location column you added to
+                          your table.
+                        </td>
+                        <td>
+                          When the form data is submitted, the script geocodes
+                          the data in the addressColumn, and saves the lat/lng
+                          coordinates in this column.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p class="warning">
+                    Make sure you have added the location column to your table and have added these
+                    properties before you run the script.
+                    <br>
+                    You cannot change your table once you start using the script.
+                  </p>
+                  <p class="topmargin">
+                    Click <b>Save</b> to save the custom properties.
+                  </p>
+                </li>
+              </ol>
+            </li>
+            <li>
+              Your new script has some placeholder code. Replace it with
+              <a href="//fusion-tables-api-samples.googlecode.com/svn/trunk/FusionTablesFormSync/src/formsync-roleaccount.js" target="_blank">this code</a>.
+              <p>
+                The code uses the Fusion Tables API, for which you need an API key. Follow
+                <a href="https://developers.google.com/fusiontables/docs/v1/using#APIKey" target="_blank">these
+                  instructions</a> and then put the key in near the top of the code:
+              </p>
+              <code>
+                var API_KEY = '<span style="outline: 1px solid #999">YOUR API KEY HERE</span>';
+              </code>
+            </li>
+            <li>
+              Click <b>File &gt; Save</b>.
+            </li>
+            <li>
+              Authorize the script.
+              <ol type="a">
+                <li>
+                  Click <b>Run &gt; checkAuthorization</b> from the top menu.
+                  You will see an "Authorization Required" dialog box.
+                </li>
+                <li>
+                  Click the <b>Continue</b> button. This brings up another window
+                  spelling out what your access the script needs. Click the
+                  blue <b>Accept</b> button to authorize the script; this adds a
+                  token to your project properties so you won't have to do this step
+                  again. See this
+                  <a href="https://developers.google.com/apps-script/guides/services/authorization"
+                     target="_blank">help article</a> for more information on authorization,
+                  including how to revoke access.
+                </li>
+              </ol>
+            </li>
+            <li>
+              Set up a trigger to run the <b>onFormSubmit</b> method when the
+              form is submitted.
+              <ol type="a">
+                <li>
+                  Click <b>Resources &gt; Current script's triggers</b>.
+                </li>
+                <li>
+                  Click <b>Add a new trigger</b>. You will see a dialog telling you
+                  there are no triggers set up. Click the link to add one.                  
+                </li>
+                <li>
+                  Choose these values from the dropdown menus:
+                  <strong>Run</strong>:
+                  onFormSubmit, <b>Events:</b> From spreadsheet, On form submit.
+                </li>
+                <li>
+                  Click <b>File &gt; Save</b>.
+                </li>
+              </ol>
+            </li>
+            <li>
+              Optional: You can set up a trigger to run the <code>sync</code>
+              method periodically.
+              <ol type="a">
+                <li>
+                  Click <b>Resources &gt; Current script's triggers</b>, then
+                  <strong>Add a new trigger</strong>.
+                </li>
+                <li>
+                  Choose these values from the dropdown menus:
+                  <strong>Run</strong>: sync, <b>Events:</b> Time-driven, Hour
+                  timer, Every hour.
+                </li>
+              </ol>
+            </li>
+            <li>
+              You're done! Now you need some data.
+            </li>
+          </ol>
+        </section>
+        <section id="send">
+          <h2>
+            Send the form to your users
+          </h2>
+          <p>
+            From the Google Form, click the blue <b>Send Form</b> button and choose one of
+            these sharing options:
+            <ul>
+              <li>
+                Send form via email: enter your users' email addresses
+              </li>
+              <li>
+                Send a link: click the URL under the "Link to share" label, copy it, and send
+              </li>
+              <li>
+                Embed the form: Click the <strong>Embed</strong> button and follow the instructions
+              </li>
+            </ul>
+          </p>
+          <p>
+            Once people start submitting form entries and the synchronization has run, you will see
+            a new column in your spreadsheet called "rowid". This holds the unique numbers used by
+            Fusion Table to identify rows; these are used by the script to apply updates and
+            deletions correctly.
+          </p>
+          <p class="warning">
+            Don't change the rowids &mdash; that could cause the synchronization to
+            have unexpected results.
+          </p>
+        </section>
+      </section>
+      <section id="trouble">
+        <h2>
+          Troubleshooting &amp; FAQs
+        </h2>
+
+        <h3>
+          My users entered  incorrect location data.
+        </h3>
+        <ol class="doublespace">
+          <li>
+            No worries! Open the spreadsheet and fix the data.
+          </li>
+          <li>
+            Click <b>Tools &gt; Script editor...</b> to go to the Script Project window.
+          </li>
+          <li>
+            Click <b>Run &gt; sync</b> from the top menu. This updates your table with the
+            corrected spreadsheet data.
+          </li>
+        </ol>
+        <h3>
+          My data is not being saved to Fusion Tables.
+        </h3>
+        <ul class="doublespace">
+          <li>
+            Double check that the column names in the spreadsheet and Fusion
+            Table match exactly. By default, they should match, but if for any
+            reason they do not, go in and change the spreadsheet columns to
+            match the table's columns.
+          </li>
+          <li>
+            Make sure that you saved your properties in
+            the Project Properties tab, <strong>not</strong> the User
+            Properties tab.
+          </li>
+        </ul>
+        <h3>
+          I want to add another question to my form now that the form is up
+          and running and collecting data.
+        </h3>
+        <ul>
+          <li>
+            Unfortunately adding another question isn't currently supported. You can't modify the table's
+            columns once the script has been used.
+          </li>
+        </ul>
+        <h3>
+          Something else is wrong.
+        </h3>
+        <ul>
+          <li>
+            From the script editor check the script logs by selecting <b>View &gt; Logs...</b>.
+            Review the errors to see what line of code the issue is occurring
+            on and submit a bug report in the
+            <a href="https://code.google.com/p/fusion-tables-api-samples/issues/list">issue tracker</a>.
+          </li>
+        </ul>
+        <p></p>
+      </section>
+    </div>
+  </body>
+</html>
