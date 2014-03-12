@@ -1,10 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
     <title>Synchronizing Fusion Tables with Google Forms</title>
-    <link rel="stylesheet" type="text/css"
-      href="//fusion-tables-api-samples.googlecode.com/svn/trunk/util/reference_style.css">
-    </link>
+    <link rel="stylesheet" type="text/css" href="../../util/reference_style.css">
+    <style type="text/css">
+      table.properties, table.properties th, table.properties td {
+        border: 1px solid #000;
+        border-collapse: none;
+        padding: 6px;
+      }
+      th.property-name {
+        width: 110px;
+      }
+      th.property-value {
+        width: 291px;
+      }
+      th.property-notes {
+        width: 473px;
+      }
+    </style>
   </head>
   <body>
     <h1>
@@ -171,16 +186,16 @@
           <p>
             Add the docid row, replacing the name and value placeholders:
           </p>
-          <table border="1" cellspacing="0" cellpadding="3">
+          <table class="properties">
             <thead>
               <tr>
-                <th width="110">
+                <th class="property-name">
                   Name
                 </th>
-                <th width="291">
+                <th class="property-value">
                   Value to use
                 </th>
-                <th width="473">
+                <th class="property-notes">
                   Notes
                 </th>
               </tr>
@@ -203,16 +218,16 @@
           <p>
             If you collect  location data, also add these properties:
           </p>
-          <table border="1" cellspacing="0" cellpadding="3">
+          <table class="properties">
             <thead>
               <tr>
-                <th width="110">
+                <th class="property-name">
                   Name
                 </th>
-                <th width="291">
+                <th class="property-value">
                   Value to use
                 </th>
-                <th width="473">
+                <th class="property-notes">
                   Notes
                 </th>
               </tr>
@@ -246,15 +261,14 @@
               </tr>
             </tbody>
           </table>
-          <p class="warning">
+          <p class="warning" style="margin-top: 16px">
             Make sure you have added the location column to your table and have added these
-            properties before you run the script.
-            <br>
-            You cannot change your table once you start using the script.
+            properties before you run the script. You cannot change your table once you start
+            using the script.
           </p>
-          <p>
-            Click "Save" to save the custom properties.
-          </p>
+        </li>
+        <li>
+          Click "Save" to save the custom properties.
         </li>
       </ol>
       <h5>
@@ -395,18 +409,18 @@
       <p>
         From the Google Form, click the blue "Send Form" button and choose one of
         these sharing options:
-        <ul>
-          <li>
-            Send form via email: enter your users' email addresses
-          </li>
-          <li>
-            Send a link: click the URL under the "Link to share" label, copy it, and send
-          </li>
-          <li>
-            Embed the form: Click the "Embed" button and follow the instructions
-          </li>
-        </ul>
       </p>
+      <ul>
+        <li>
+          Send form via email: enter your users' email addresses
+        </li>
+        <li>
+          Send a link: click the URL under the "Link to share" label, copy it, and send
+        </li>
+        <li>
+          Embed the form: Click the "Embed" button and follow the instructions
+        </li>
+      </ul>
       <p>
         Once people start submitting form entries and the synchronization has run, you will see
         the "rowid" column in your spreadsheet filling up with the unique numbers used by

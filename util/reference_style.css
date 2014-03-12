@@ -59,8 +59,9 @@ p {
 table {
   border-collapse: collapse;
   border-color: #3366CC;
-  border-spacing:0;
-  border: 1px solid;
+  border-spacing: 0;
+  border-width: 1px;
+  border-style: solid;
   clear: right;
   margin: 1em 0 0 26px;
 }
