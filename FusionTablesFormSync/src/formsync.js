@@ -325,8 +325,10 @@ function mapRowsByRowId(columns, rows) {
       if (!map[-1]) {
         map[-1] = [];
       }
-      // Add the spreadsheet row number to the map
-      columnMap.spreadsheetRowNum = i + 1;
+      // Add the (one-based) spreadsheet row number to the map.
+      // Since we've excluded the headers from the row, spreadsheet
+      // row numbers for data start at 2.
+      columnMap.spreadsheetRowNum = i + 2;
       map[-1].push(columnMap);
     } else {
       map[rowId] = columnMap;
