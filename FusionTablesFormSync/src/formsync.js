@@ -1,10 +1,15 @@
 /**
- * AppsScript-based script to run in a Google Spreadsheet that synchronizes
- * Forms responses with a Fusion Table.
+ * AppsScript script to run in a Google Spreadsheet that synchronizes
+ * Google Forms responses with a Fusion Table.
  */
 
+var DOCID;
+var ADDRESS_COLUMN;
+var LOCATION_COLUMN;
+var TIME_ZONE;
+
 /**
- * Do-nothing method to trigger the authorization dialog if necessary.
+ * Do-nothing method to trigger the authorization dialog if not already done.
  */
 function checkAuthorization() {
 }
@@ -14,7 +19,7 @@ function checkAuthorization() {
  */
 function sync() {
   init();
-  
+
   // Get the data in the spreadsheet and convert it to a dictionary.
   var sheet = SpreadsheetApp.getActiveSheet();
   var lastRow = sheet.getLastRow();
@@ -24,7 +29,7 @@ function sync() {
   var columns = spreadsheetValues[0];
   var spreadsheetMap = mapRowsByRowId(columns,
       spreadsheetValues.slice(1, spreadsheetValues.length));
-  
+
   // Get the columns in the spreadsheet and escape any single quotes
   var escapedColumns = [];
   for (var i = 0; i < columns.length; i++) {
@@ -32,20 +37,15 @@ function sync() {
     columnName = escapeQuotes(columnName);
     escapedColumns.push(columnName);
   }
-  
+
   // Get the data from the table and convert to a dictionary.
-  var docid = ScriptProperties.getProperty('docid');
-  var query = "SELECT '" + escapedColumns.join("','") + "' FROM " + docid;
+  var query = "SELECT '" + escapedColumns.join("','") + "' FROM " + DOCID;
   var ftResults = runSqlWithRetry(query);
   if (!ftResults) {
     return;
   }
   var ftMap = mapRowsByRowId(ftResults.columns, ftResults.rows);
-  
-  // Get the properties associated with this Script.
-  var addressColumn = ScriptProperties.getProperty('addressColumn');
-  var latlngColumn = ScriptProperties.getProperty('latlngColumn');
-  
+
   // For each row in the Fusion Table, find if the row still exists in the
   // spreadsheet. If it exists, make sure the values are the same. If
   // they are different, update the Fusion Table data.
@@ -63,22 +63,17 @@ function sync() {
         var tableValue = tableRow[column];
         var spreadsheetValue = spreadsheetRow[column];
         if (tableValue != spreadsheetValue) {
-          if (addressColumn == column) {
-            var latlng = geocode(spreadsheetValue);
-            latlngColumn = escapeQuotes(latlngColumn);
-            updates.push("'" + latlngColumn + "' = '" + latlng + "'");
-          }
-          spreadsheetValue = escapeQuotes(spreadsheetValue);
-          column = escapeQuotes(column);
-          updates.push("'" + column + "' = '" + spreadsheetValue + "'");
+          spreadsheetValue = processSpreadsheetValue(column, spreadsheetValue);
+          updates.push("'" + escapeQuotes(column) + "' = '" +
+              spreadsheetValue + "'");
         }
       }
-      
+
       // If there are updates, send the UPDATE query.
       if (updates.length) {
         var query = [];
         query.push('UPDATE ');
-        query.push(docid);
+        query.push(DOCID);
         query.push(' SET ');
         query.push(updates.join(','));
         query.push(" WHERE rowid = '");
@@ -87,14 +82,15 @@ function sync() {
         runSqlWithRetry(query.join(''));
         waitBetweenCalls();
       }
-      
+
     } else {
       // If the row doesn't exist in the spreadsheet, delete it from the table
-      runSqlWithRetry('DELETE FROM ' + docid + " WHERE rowid = '" + rowId + "'");
+      runSqlWithRetry('DELETE FROM ' + DOCID + " WHERE rowid = '" +
+          rowId + "'");
       waitBetweenCalls();
     }
   }
-  
+
   // Insert all the data into the Fusion Table that failed to insert.
   // These rows were given a rowid of -1 or have a blank rowid.
   var failedInserts = spreadsheetMap[-1];
@@ -120,13 +116,13 @@ function onFormSubmit(e) {
   // Get the row number of the newly entered data.
   var sheet = SpreadsheetApp.getActiveSheet();
   var row = sheet.getLastRow();
-  
+
   // Check to make sure the rowid column is there.
   init();
-  
+
   // The values entered into the form, mapped by question.
   var formValues = e.namedValues;
-  
+
   // Insert the data into the Fusion Table.
   var rowId = createRecord(formValues);
   if (!rowId) {
@@ -137,22 +133,22 @@ function onFormSubmit(e) {
 
 /**
  * Ensures the docid property for the target table is set, that if the
- * address column is set the latLngColumn is also set, and adds a rowid
+ * address column is set the latlngColumn is also set, and adds a rowid
  * column to the sheet if it doesn't have one.
  */
 function init() {
-  var docid = ScriptProperties.getProperty('docid');
-  if (!docid) {
+  // Set up global properties
+  DOCID = ScriptProperties.getProperty('docid');
+  if (!DOCID) {
     throw 'The script is missing the required docid Project Property';
   }
-  
-  var addressColumn = ScriptProperties.getProperty('addressColumn');
-  var latlngColumn = ScriptProperties.getProperty('latlngColumn');
-  if (addressColumn && !latlngColumn) {
-    throw('Since you added an addressColumn project property, ' +
-          'you also need to add a latlngColumn property');
+  ADDRESS_COLUMN = ScriptProperties.getProperty('addressColumn');
+  LOCATION_COLUMN = ScriptProperties.getProperty('latlngColumn');
+  if (ADDRESS_COLUMN && !LOCATION_COLUMN) {
+    throw('Since you added an ADDRESS_COLUMN project property, ' +
+        'you also need to add a latlngColumn property');
   }
-  
+  TIME_ZONE = Session.getScriptTimeZone();
   var sheet = SpreadsheetApp.getActiveSheet();
   var lastColumn = sheet.getLastColumn();
   var lastHeaderValue = sheet.getRange(1, lastColumn).getValue();
@@ -167,11 +163,6 @@ function init() {
  * @return {?string} the rowid if successful, otherwise null.
  */
 function createRecord(columnValues) {
-  // Get the properties associated with this Script.
-  var docid = ScriptProperties.getProperty('docid');
-  var addressColumn = ScriptProperties.getProperty('addressColumn');
-  var latlngColumn = ScriptProperties.getProperty('latlngColumn');
-  
   // Create lists of the column names and values to create the INSERT Statement.
   var columns = [];
   var values = [];
@@ -179,34 +170,22 @@ function createRecord(columnValues) {
     // If the column is not the spreadsheetRowNum,
     // add it and the value to the lists.
     if (column != 'spreadsheetRowNum') {
-      var value = columnValues[column];
-      
-      // If an address column was specified, geocode the value in it.
-      if (addressColumn && column == addressColumn) {
-        var latlng = geocode(value);
-        latlngColumn = escapeQuotes(latlngColumn);
-        
-        columns.push(latlngColumn);
-        values.push(latlng);
-      }
-      value = escapeQuotes(value);
-      values.push(value);
-      
+      values.push(processSpreadsheetValue(column, columnValues[column]));
       column = escapeQuotes(column);
       columns.push(column);
     }
   }
-  
+
   var query = [];
   query.push('INSERT INTO ');
-  query.push(docid);
+  query.push(DOCID);
   query.push(" ('");
   query.push(columns.join("','"));
   query.push("') ");
   query.push("VALUES ('");
   query.push(values.join("','"));
   query.push("')");
-  
+
   var response = runSqlWithRetry(query.join(''));
   if (response) {
     var rowId = response.rows[0][0];
@@ -229,13 +208,22 @@ function insertRowId(rowId, row) {
 /**
  * Returns the geocoded address.
  * @param {string} address The user-entered address.
- * @return {string} the geocoded results.
+ * @return {string} The geocoded results as a lat,long pair.
  */
 function geocode(address) {
   if (!address) {
     return '0,0';
   }
   var results = Maps.newGeocoder().geocode(address);
+
+  // If all your form responses will be within a given area, you may get better
+  // geocoding results by biasing to that area. Uncomment the code below and set
+  // the desired region, bounding box, or component filter. The example shows
+  // how to indicate that the addresses should be in Spain. For full details, see
+  // https://developers.google.com/maps/documentation/javascript/geocoding#GeocodingRequests
+  //
+  // var results = Maps.newGeocoder().geocode({ address: address, region: 'es' });
+
   Logger.log('Geocoding: ' + address);
   if (results.status == 'OK') {
     var bestResult = results.results[0];
@@ -249,6 +237,25 @@ function geocode(address) {
     Logger.log(results.status);
     return '0,0';
   }
+}
+
+/**
+ * Geocodes the value if this is the address column, or formats it as a date if
+ * this is the timestamp column, escapes quotes, and returns the value.
+ * @param {string} column Column name.
+ * @param {string} column Spreadsheet value.
+ * @return {string} The converted or escaped value.
+ */
+function processSpreadsheetValue(column, value) {
+  if (column === ADDRESS_COLUMN) {
+    return geocode(value);
+  }
+  if (column === 'Timestamp') {
+    // Ensure this is a format Fusion Tables understands
+    return Utilities.formatDate(new Date(value), TIME_ZONE,
+        'yyyy-MM-dd HH:mm:ss');
+  }
+  return escapeQuotes(value);
 }
 
 var TOO_MANY_REQUESTS = 'The sync script has exceeded rate limits';
@@ -314,13 +321,13 @@ function mapRowsByRowId(columns, rows) {
     var row = rows[i];
     var rowId = row[row.length - 1];
     var columnMap = {};
-    
+
     for (var j = 0; j < columns.length; j++) {
       var columnName = columns[j];
       var columnValue = row[j];
       columnMap[columnName] = columnValue;
     }
-    
+
     if (rowId == -1 || !rowId) {
       if (!map[-1]) {
         map[-1] = [];
@@ -345,7 +352,7 @@ function waitBetweenCalls() {
 }
 
 /**
- * Returns the value with single quotes escaped.
+ * Returns the value with single quotes and backslashes escaped.
  */
 function escapeQuotes(value) {
   if (!value) {
@@ -354,5 +361,5 @@ function escapeQuotes(value) {
   if (typeof value != 'string') {
     value = value.toString();
   }
-  return value.replace(/'/g, "\\\'"); //'");
+  return value.replace(/\\/g, '\\\\').replace(/'/g, "\\\'");
 }
