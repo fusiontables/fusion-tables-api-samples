@@ -8,7 +8,7 @@ goog.require('goog.ui.AnimatedZippy');
  * @constructor
  * @param {int} width The chart width in pixels.
  * @param {int} height The chart height in pixels.
- * @param {string} baseUrl Base Fusion Tables URL.
+ * @param {string} baseUrl The base URL for gvizdata calls.
  */
 ftchartconfig = function(width, height, baseUrl) {
   this.defaultWidth_ = width;
@@ -298,7 +298,7 @@ ftchartconfig.prototype.updateHTML = function() {
   sHTML += '    </title>\n';
   sHTML += '    <script type=\"text/javascript\" src=\"http://www.google.com/jsapi\"><\/script>\n';
   sHTML += '    <script type=\"text/javascript\">\n';
-  sHTML += '      google.load('visualization', '1');\n';
+  sHTML += '      google.load(\'visualization\', \'1\');\n';
   sHTML += '    <\/script>\n';
   sHTML += '    <script type=\"text/javascript\">\n';
   sHTML += '      var winW = 500, winH = 300;\n';
@@ -306,7 +306,7 @@ ftchartconfig.prototype.updateHTML = function() {
   sHTML += '       winW = document.body.offsetWidth;\n';
   sHTML += '       winH = document.body.offsetHeight;\n';
   sHTML += '      }\n';
-  sHTML += '      if (document.compatMode=='CSS1Compat' &&\n';
+  sHTML += '      if (document.compatMode == \'CSS1Compat\' &&\n';
   sHTML += '          document.documentElement &&\n';
   sHTML += '          document.documentElement.offsetWidth ) {\n';
   sHTML += '       winW = document.documentElement.offsetWidth;\n';
@@ -381,6 +381,7 @@ var ftchartconfig_response_context;
 
 /**
  * Fills the selected columns in the form after user enters table id.
+ */
 ftchartconfig.prototype.fetchColumns = function() {
   this.colList_ = {};
   this.colType_ = {};
@@ -400,15 +401,10 @@ ftchartconfig.prototype.fetchColumns = function() {
   ftchartconfig_response_context = this;
   var tableid = document.getElementById('tableid').value;
   if (tableid) {
-    query = 'DESCRIBE+' + document.getElementById('tableid').value;
-    var script = document.createElement('script');
-    script.setAttribute(
-      'src',
-      this.ftBaseUrl_ +
-        '/api/query?sql=' + query +
-        '&jsonCallback=configureSelectColumns'
-    );
-    document.body.appendChild(script);
+    var request = gapi.client.fusiontables.table.get({ 'tableId': tableid });
+    request.execute(function(response) {
+      configureSelectColumns(response);
+    });
   }
 
   // clear all areas
@@ -436,11 +432,10 @@ ftchartconfig.prototype.fetchColumns = function() {
  * @param {Object} response The query response object.
  */
 function configureSelectColumns(response) {
-  var table = response['table'];
-  var rows = table['rows'];
+  var columns = response['columns'];
   // save column types
-  for (var r = 0; r < rows.length; r++) {
-    ftchartconfig_response_context.colType_[rows[r][1]] = rows[r][2];
+  for (var icol = 0; icol < columns.length; icol++) {
+    ftchartconfig_response_context.colType_[columns[icol]['name']] = columns[icol]['type'];
   }
   ftchartconfig_response_context.createColumnSelector();
 }
@@ -614,7 +609,7 @@ ftchartconfig.prototype.updateSelectText = function() {
 /**
  * Creates zippies.
  */
-ftchartconfig.prototype.createZips = function() {
+ftchartconfig.prototype.createZippies = function() {
   this.zips_.push(new goog.ui.AnimatedZippy('header2', 'content2'));
   this.zips_.push(new goog.ui.AnimatedZippy('headeriframe', 'chartiframe'));
   this.zips_.push(new goog.ui.AnimatedZippy('headerURL', 'chartURL'));

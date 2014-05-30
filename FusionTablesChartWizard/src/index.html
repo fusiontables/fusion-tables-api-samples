@@ -11,33 +11,63 @@
     <title>FusionTables Chart Wizard</title>
 
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
     <script type="text/javascript"> 
       google.load('visualization', '1', {packages: ['charteditor']});
     </script>
 
-    <!--
-    <script type="text/javascript" src="../closure-library/closure/goog/base.js">
+    <!-- Uncomment during development:
+    <script type="text/javascript" src="../../closure-library/closure/goog/base.js">
     </script>
     <script type="text/javascript" src="ftchartconfig.js"></script>
     -->
-    <script type="text/javascript" src="ftchartconfig_compiled.js"></script>
 
+    <script type="text/javascript" src="ftchartconfig_compiled.js"></script>
+    
     <script type="text/javascript">
-       var ftchartWiz = new ftchartconfig( 
-         500, 300, "https://www.google.com/fusiontables");
+      if (window.location.protocol == "file:") {
+        alert('This script only works when loaded from a web server,' +
+            ' not from a file on your computer.');
+        return;
+      }
+
+      var ftchartWiz;
+
+      function onLoadGapi() {
+        gapi.client.setApiKey('AIzaSyAm9yWCV7JPCTHCJut8whOjARd7pwROFDQ');
+        loadFtApi();
+      }
+
+      function loadFtApi() {
+        gapi.client.load('fusiontables', 'v1', initialize);
+      }
+
+      function initialize() {
+        ftchartWiz = new ftchartconfig(500, 300,
+            'https://www.google.com/fusiontables');
+        ftchartWiz.createZippies();
+      }
     </script>
+
+    <script type="text/javascript"
+        src="https://apis.google.com/js/client.js?onload=onLoadGapi">
+    </script>
+
     <link rel="stylesheet" href="style.css" type="text/css"></link>
 
     <script type="text/javascript">
-
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-9117623-10']);
       _gaq.push(['_trackPageview']);
 
       (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ?
+            'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
       })();
 
     </script>
@@ -287,10 +317,6 @@
         <img src="images/blank.gif"/>Your HTML
       </h3>
       <textarea id="htmlCode"></textarea>
-
-    <script type="text/javascript">
-      ftchartWiz.createZips();
-    </script>
   </body>
 
 </html>

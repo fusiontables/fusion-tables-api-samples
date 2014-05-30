@@ -1,1 +1,4 @@
-../closure-library/closure/bin/build/closurebuilder.py --root=../closure-library --root=. -i ftchartconfig.js -n ftchartconfig --output_mode=compiled --compiler_jar=../compiler.jar >ftchartconfig_compiled.js
+#!/bin/sh
+CLOSURE_DIR=../..
+CLOSURE_ROOT=$CLOSURE_DIR/closure-library
+$CLOSURE_ROOT/closure/bin/build/closurebuilder.py --root=$CLOSURE_ROOT --root=. -i ftchartconfig.js -n ftchartconfig --output_mode=compiled --compiler_jar=$CLOSURE_DIR/compiler.jar > ftchartconfig_compiled.js
