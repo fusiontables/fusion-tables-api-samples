@@ -432,6 +432,11 @@ ftchartconfig.prototype.fetchColumns = function() {
  * @param {Object} response The query response object.
  */
 function configureSelectColumns(response) {
+  console.dir(response);
+  if (response.error) {
+    alert('Unable to get the table columns: ' + response.error.message);
+    return;
+  }
   var columns = response['columns'];
   // save column types
   for (var icol = 0; icol < columns.length; icol++) {
