@@ -19,19 +19,19 @@
     <!-- Uncomment during development:
     <script type="text/javascript" src="../../closure-library/closure/goog/base.js">
     </script>
-    <script type="text/javascript" src="ftchartconfig.js"></script>
     -->
+
+    <script type="text/javascript" src="ftchartconfig.js"></script>
 
     <script type="text/javascript" src="ftchartconfig_compiled.js"></script>
     
     <script type="text/javascript">
+      var ftchartWiz;
+
       if (window.location.protocol == "file:") {
         alert('This script only works when loaded from a web server,' +
             ' not from a file on your computer.');
-        return;
       }
-
-      var ftchartWiz;
 
       function onLoadGapi() {
         gapi.client.setApiKey('AIzaSyAm9yWCV7JPCTHCJut8whOjARd7pwROFDQ');
