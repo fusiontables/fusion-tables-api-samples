@@ -36,6 +36,9 @@ function sync() {
     var columnName = columns[i];
     columnName = escapeQuotes(columnName);
     escapedColumns.push(columnName);
+    if (column === ADDRESS_COLUMN) {
+      escapedColumns.push(escapedQuotes(LOCATION_COLUMN));
+    }
   }
 
   // Get the data from the table and convert to a dictionary.
@@ -63,9 +66,7 @@ function sync() {
         var tableValue = tableRow[column];
         var spreadsheetValue = spreadsheetRow[column];
         if (tableValue != spreadsheetValue) {
-          spreadsheetValue = processSpreadsheetValue(column, spreadsheetValue);
-          updates.push("'" + escapeQuotes(column) + "' = '" +
-              spreadsheetValue + "'");
+          spreadsheetValue = processSpreadsheetValue(column, spreadsheetValue, updates, true);
         }
       }
 
@@ -138,12 +139,12 @@ function onFormSubmit(e) {
  */
 function init() {
   // Set up global properties
-  DOCID = ScriptProperties.getProperty('docid');
+  DOCID = getProperty('docid');
   if (!DOCID) {
     throw 'The script is missing the required docid Project Property';
   }
-  ADDRESS_COLUMN = ScriptProperties.getProperty('addressColumn');
-  LOCATION_COLUMN = ScriptProperties.getProperty('latlngColumn');
+  ADDRESS_COLUMN = getProperty('addressColumn');
+  LOCATION_COLUMN = getProperty('latlngColumn');
   if (ADDRESS_COLUMN && !LOCATION_COLUMN) {
     throw('Since you added an ADDRESS_COLUMN project property, ' +
         'you also need to add a latlngColumn property');
@@ -155,6 +156,21 @@ function init() {
   if (lastHeaderValue != 'rowid') {
     sheet.getRange(1, lastColumn + 1).setValue('rowid');
   }
+}
+
+/**
+ * Returns the named property, first trying as a user property, then
+ * as a script property.
+ * @param {string} name The property name.
+ * @return {string?} The property value.
+ */
+function getProperty(name) {
+  var value = UserProperties.getProperty(name);
+  if (!value) {
+    // The ScriptProperties API is deprecated so this is a fallback
+    value = ScriptProperties.getProperty(name);
+  }
+  return value;
 }
 
 /**
@@ -170,9 +186,12 @@ function createRecord(columnValues) {
     // If the column is not the spreadsheetRowNum,
     // add it and the value to the lists.
     if (column != 'spreadsheetRowNum') {
-      values.push(processSpreadsheetValue(column, columnValues[column]));
+      processSpreadsheetValue(column, columnValues[column], values, false);
       column = escapeQuotes(column);
       columns.push(column);
+      if (column === ADDRESS_COLUMN) {
+        columns.push(escapeQuotes(LOCATION_COLUMN));
+      }
     }
   }
 
@@ -246,16 +265,27 @@ function geocode(address) {
  * @param {string} column Spreadsheet value.
  * @return {string} The converted or escaped value.
  */
-function processSpreadsheetValue(column, value) {
-  if (column === ADDRESS_COLUMN) {
-    return geocode(value);
-  }
+function processSpreadsheetValue(column, value, sqlStatements, updating) {
+  var safeValue;
   if (column === 'Timestamp') {
     // Ensure this is a format Fusion Tables understands
-    return Utilities.formatDate(new Date(value), TIME_ZONE,
+    safeValue = Utilities.formatDate(new Date(value), TIME_ZONE,
         'yyyy-MM-dd HH:mm:ss');
   }
-  return escapeQuotes(value);
+  safeValue = escapeQuotes(value);
+  sqlStatements.push(formatSqlValue(column, safeValue, updating));
+  if (column === ADDRESS_COLUMN) {
+    // Geocode and assign to the location column
+    sqlStatements.push(formatSqlValue(LOCATION_COLUMN, geocode(value), updating));
+  }
+}
+
+function formatSqlValue(column, safeValue, updating) {
+  if (updating) {
+    return "'" + escapeQuotes(column) + "' = '" + safeValue + "'";
+  }
+  // Inserts just take the quoted value
+  return safeValue;
 }
 
 var TOO_MANY_REQUESTS = 'The sync script has exceeded rate limits';
