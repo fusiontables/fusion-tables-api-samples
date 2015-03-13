@@ -23,7 +23,7 @@
   </head>
   <body>
     <h1>
-      Synchronizing a Google Form with a Fusion Table
+      Synchronizing Fusion Tables with Google Forms
     </h1>
     <p>
       With a simple script, you can set up a Google Form that your users
@@ -73,7 +73,7 @@
         them for you, there are some additional steps to follow (noted below).
       </p>
       <p>
-        Also note that once you have started collecting data, you can not
+        Also note that once you have started collecting data, you cannot
         make any changes to the form or Fusion Table.
       </p>
     </section>
@@ -276,7 +276,7 @@
       </h5>
       <p>
         Follow
-        <a href="https://developers.google.com/apps-script/guides/services/advanced" target="_blank">
+        <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services" target="_blank">
           these instructions</a> to enable the use of the Fusion Tables service for
         Apps Script and in the Developer Console.
       </p>
@@ -477,6 +477,13 @@
           columns once the script has been used.
         </li>
       </ul>
+      <h3>
+        "ReferenceError: "FusionTables" is not defined."
+      </h3>
+      <ul>
+      <li>
+      Ensure that you <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services" target="_blank">enabled the Fusion Tables Service</a>.
+      </li>
       <h3>
         Something else is wrong.
       </h3>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Synchronizing Fusion Tables with Google Sheets</title>
+    <link rel="stylesheet" type="text/css" href="../../util/reference_style.css">
+    <style type="text/css">
+      table.properties, table.properties th, table.properties td {
+        border: 1px solid #000;
+        border-collapse: none;
+        padding: 6px;
+      }
+      th.property-name {
+        width: 110px;
+      }
+      th.property-value {
+        width: 291px;
+      }
+      th.property-notes {
+        width: 473px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>
+      Synchronizing Fusion Tables with Google Sheets
+    </h1>
+    <p>
+      With a simple script, you can replace the contents of a Fusion Table with
+      the rows of a Google spreadsheet. The script takes advantage
+      of <a href="http://code.google.com/googleapps/appsscript/">Google's
+           Apps Script tool</a> to run the appropriate <code>replaceRows</code> call.      
+    </p>
+    <section id="toc">
+      <h2>
+        Table of Contents
+      </h2>
+      Steps
+      <ol>              
+        <li>
+          <a href="#importTable">Import your spreadsheet into Fusion Tables</a>
+        </li>
+        <li>
+          <a href="#script">Set up the script</a>
+        </li>
+        <li>
+          <a href="#triggers">Set up triggers</a>
+        </li>
+      </ol>
+      <p>
+        <a href="#trouble">Troubleshooting</a>
+      </p>
+    </section>
+    <section id="importTable">
+      <h2>
+        Import your spreadsheet into Fusion Tables
+      </h2>
+      <ol>
+        <li>
+          From the <a href="https://www.google.com/fusiontables" target="_blank">
+          Fusion Tables home page</a> click the blue "Create a Fusion Table" button.
+        </li>
+        <li>
+          In the "Import new table" dialog box, select Google Spreadsheets in the left-hand column.
+          Select your spreadsheet from the list and import.
+        </li>
+        <li>
+          Click "File > About this table" and note the table ID at the bottom.
+        </li>
+      </ol>
+      If you later add, remove, or reorder columns in your sheet, you should make the equivalent
+      changes in the table using "Edit &gt; Change columns".
+    </section>
+    <section id="script">
+      <h2>
+        Set up the script
+      </h2>
+      <h5>
+        Create the script project
+      </h5>
+      <ol>
+        <li>
+          Click on the browser tab spreadsheet and click "Tools &gt; Script editor..."
+          to bring up the Apps Script project window.
+        </li>
+        <li>
+          If you see a dialog entitled "Google Apps Script", click "Blank Project"
+          in the "Create script for" section.
+        </li>
+      </ol>
+      <h5 id="setUpService">
+        Enable the Fusion Tables service
+      </h5>
+      <p>
+        Follow
+        <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services" target="_blank">these instructions</a>
+        to enable the use of the Fusion Tables service for Apps Script and in the Developer Console.
+      </p>
+      <h5>
+        Add the code
+      </h5>
+      <ol>
+        <li>
+          Your new script has some placeholder code. Replace it with
+          <a href="../src/sheetsync.js" target="_blank">this code</a>.
+        </li>
+        <li>
+          Change this line to put your table ID in where it says "YOUR TABLE ID":
+          <p>
+            <code>var TABLE_ID = 'YOUR TABLE ID';</code>
+          </p>
+        </li>
+        <li>
+          Optional: if you have multiple header rows, put the row number of the first data
+          row on this line:
+          <p>
+            <code>var FIRST_DATA_ROW = 2;</code>
+          </p>
+        </li>
+        <li>
+          Optional: if you want to allow the spreadsheet to have different columns than the table,
+          change this value to "false":
+          <p>
+            <code>var REQUIRE_SAME_COLUMNS = true;</code>
+          </p>
+        </li>
+        <li>
+          Click "File &gt; Save".
+        </li>
+      </ol>
+      <h5>
+        Authorize the script
+      </h5>
+      <ol>
+        <li>
+          Click "Run &gt; sync" from the top menu. You will see an "Authorization Required" dialog box.
+        </li>
+        <li>
+          Click the "Continue" button. This brings up another window
+          spelling out what your access the script needs. Click the
+          blue "Accept" button to authorize the script; this adds a
+          token to your project properties so you won't have to do this step
+          again. See this
+          <a href="https://developers.google.com/apps-script/guides/services/authorization"
+             target="_blank">help article</a> for more information on authorization,
+          including how to revoke access.
+        </li>
+      </ol>
+    </section>
+
+    <section id="triggers">
+      <h2>
+        Set up triggers
+      </h2>
+      <p>
+        Spreadsheet triggers run Apps Script code based on various events. You can update your
+        Fusion Table from your spreadsheet periodically or after every change. In this example
+        the script is set up to run once an hour.
+      </p>
+      <ol>
+        <li>
+          Click "Resources &gt; Current project's triggers".
+        </li>
+        <li>
+          Choose these values from the dropdown menus:
+          <b>Run</b>: sync, <b>Events:</b> Time-driven, Hour timer, Every hour
+        </li>          
+        <li>
+          Click "Save".
+        </li>
+      </ol>
+      <h5>
+        Set up error notifications
+      </h5>
+      <p>
+        Triggers can notify you of problems by email. When you are first getting set up,
+        it's a good idea to set up notifcations so you can see what's going on.
+        This <a href="https://developers.google.com/apps-script/understanding_triggers"
+            target="_blank">help page</a>
+        has more details at the bottom of the page in the "Errors in Triggers" section.
+      </p>
+      <ol>
+        <li>
+          Click "Resources &gt; Current project's triggers".
+        </li>
+        <li>
+          Click on the "Notifications" link for the "onFormSubmit" or "sync" trigger.
+        </li>
+        <li>
+          Choose the appropriate time to email. When you are first getting set up, choosing
+          "immediately" will make it easier to see what's going wrong.
+        </li>          
+        <li>
+          Click "Save".
+        </li>
+      </ol>
+
+      <sction>
+      <h2>
+        Try it all out
+      </h2>
+      <ol>
+        <li>
+          Make a change to your spreadsheet that you will easily be able to spot in your
+          Fusion Table.
+        </li>
+        <li>
+          Run the sync script from the script edtor as described above.
+        </li>
+        <li>
+          Check that the Fusion Table has the new values. You will have to refresh the web page
+          to get the latest data. If your spreadsheet is large, the changes may not appear
+          immediately; the previous version of the table continues to be available until the
+          table contents are completely replaced.
+        </li>
+        <li>
+          If you don't see the new values, or you get an execution error, from the script editor
+          click "View &gt; Execution transcript" and "View &gt; Logs" to see if anything shows up.
+          You might also get an error notification email.
+        </li>
+        <li>
+          If you do see the new values, you're done!
+        </li>
+      </ol>
+    </section>
+
+    <section id="trouble">
+      <h2>
+        Troubleshooting
+      </h2>
+      
+      <h3>
+        "Content has a different number of columns than the table"
+      </h3>
+      This means your table and spreadsheet no longer match up. You can either edit your
+      script and change <code>REQUIRE_SAME_COLUMNS</code> to false, or use
+      "Edit &gt; Change columns" in your table to add, remove, or reorder the columns
+      to match your spreadsheet.
+
+      <h3>
+        "ReferenceError: "FusionTables" is not defined."
+      </h3>
+      Ensure that you <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services" target="_blank">enabled the Fusion Tables Service</a>.
+
+      <h3>
+        Log message: "Skipping row replacement because of N active background task(s)"
+      </h3>
+      This means the table schema was being changed or its rows were in the process of being
+      deleted, either from the web app or an API call.
+
+      <h3>
+        Something else is wrong.
+      </h3>
+      From the script editor check the script logs by selecting "View &gt; Logs" and
+      "View &gt; Execution transcript". If you see errors and they aren't self-explanatory,
+      follow the suggestions in this
+      <a href="https://support.google.com/fusiontables/answer/3337732">help article</a>
+      for getting help. Code-related questions are usually best asked on
+      <a href="http://stackoverflow.com/questions/ask?tags=fusion-tables">StackOverflow</a>.
+    </section>
+  </body>
+</html>
