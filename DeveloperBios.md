@@ -1,0 +1,2 @@
+## Kathryn Hurley ##
+Kathryn is a developer programs engineer at Google. Her mission is to teach developers about the awesomeness that is the Fusion Tables API and help them develop super cool applications with the API. She presents at conferences, including IO!, develops sample code, and writes articles.
