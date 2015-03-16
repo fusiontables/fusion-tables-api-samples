@@ -28,7 +28,7 @@ function sync() {
       var csvBlob = Utilities.newBlob(convertToCsv_(values),
           'application/octet-stream');
       FusionTables.Table.replaceRows(TABLE_ID, csvBlob,
-         { isStrict: REQUIRE_SAME_COLUMNS, startLine: FIRST_DATA_ROW });
+         { isStrict: REQUIRE_SAME_COLUMNS, startLine: FIRST_DATA_ROW - 1 });
       Logger.log('Replaced ' + values.length + ' rows');
     }
   } else {
