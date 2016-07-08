@@ -141,10 +141,6 @@ Here the curl option `-T` indicates HTTP method PUT, which is how you update rat
 
 If you want to work more extensively with JSON in bash, check out [TickTick](https://github.com/kristopolous/TickTick).
 
-</div>
-
-<div class="outline-3">
-
 ## Explanations
 
 The script `RUN_ME_FIRST.sh` talks to [https://accounts.google.com/o/oauth2/token](https://accounts.google.com/o/oauth2/token) to set up an initial working file `credentials.sh`. Code in `common.sh` updates this file to manage credentials for an "installed application" that can access tables on your behalf. The script `ftsql.sh` is the simplest illustration of using the possibly refreshed access token. It uses curl to send a POST request to [https://www.googleapis.com/fusiontables/v1/query?alt=csv](https://www.googleapis.com/fusiontables/v1/query?alt=csv). Its invocation arguments become the value of the request parameter, `sql`. The script `ftapi.sh` uses curl to send requests to a URI under [https://www.googleapis.com/fusiontables/v1](https://www.googleapis.com/fusiontables/v1). The first argument is the URI. Additional arguments are passed through to curl. The examples above use only `-d` and `-T` on the command line. Internally, the scripts also use `-H` to set the following two headers
@@ -152,8 +148,6 @@ The script `RUN_ME_FIRST.sh` talks to [https://accounts.google.com/o/oauth2/toke
 <pre> -H "Content-Type: application/json"
  -H "Authorization: Bearer $access_token"
 </pre>
-
-<div class="outline-4">
 
 ### Managing credentials
 
@@ -169,14 +163,8 @@ The script `RUN_ME_FIRST.sh` obtains `refresh_token`, `access_token`, and `expir
 
 <sup>[1](#fnr.1)</sup>Tested with Ubuntu, Mac OS, and Cygwin
 
-</div>
-
-</div>
-
-<div id="postamble">
 
 Author: Anno Langen [<googletables-feedback@google.com>](mailto:googletables-feedback@google.com)
 
 Date: 2012/10/02 12:35:44
 
-</div>
