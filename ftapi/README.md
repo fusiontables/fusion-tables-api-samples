@@ -1,14 +1,8 @@
 # Using Fusion Tables from bash
 
-<div class="outline-3">
-
-### Introduction
+## Introduction
 
 This code lab shows how to access [Google Fusion Tables](https://www.google.com/fusiontables) from a bash<sup>[1](#fn.1)</sup> command line. Google provides Fusion Tables to let you visualize and share table data. To keep private data secure, a certain amount of setup is required to access Fusion Tables from your computer's command line. This code lab walks you through that setup and demonstrates success with some extensible examples. The [developer website](https://developers.google.com/fusiontables) has more details, [sample code](https://developers.google.com/fusiontables/docs/sample_code), and [client libraries](https://developers.google.com/fusiontables/docs/v1/libraries) for specific programming languages. The [APIs Explorer](https://developers.google.com/apis-explorer/#p/fusiontables/v1/) site also provides an interactive web interface to test out calls to the API.
-
-</div>
-
-<div class="outline-3">
 
 ### Installation
 
@@ -25,11 +19,7 @@ We will configure bash scripts in this directory to act as an ["installed applic
 
 3.  Execute `RUN_ME_FIRST.sh`, which opens a browser where you grant the "installed application" access to your tables. Copy the resulting "code" and paste it into the running script's prompt. The script exchanges the code for OAuth credentials and updates `credentials.sh` with them.
 
-</div>
-
-<div class="outline-3">
-
-### Example use
+## Example use
 
 Now you are ready to use the other scripts. For example
 
@@ -155,7 +145,7 @@ If you want to work more extensively with JSON in bash, check out [TickTick](htt
 
 <div class="outline-3">
 
-### Explanations
+## Explanations
 
 The script `RUN_ME_FIRST.sh` talks to [https://accounts.google.com/o/oauth2/token](https://accounts.google.com/o/oauth2/token) to set up an initial working file `credentials.sh`. Code in `common.sh` updates this file to manage credentials for an "installed application" that can access tables on your behalf. The script `ftsql.sh` is the simplest illustration of using the possibly refreshed access token. It uses curl to send a POST request to [https://www.googleapis.com/fusiontables/v1/query?alt=csv](https://www.googleapis.com/fusiontables/v1/query?alt=csv). Its invocation arguments become the value of the request parameter, `sql`. The script `ftapi.sh` uses curl to send requests to a URI under [https://www.googleapis.com/fusiontables/v1](https://www.googleapis.com/fusiontables/v1). The first argument is the URI. Additional arguments are passed through to curl. The examples above use only `-d` and `-T` on the command line. Internally, the scripts also use `-H` to set the following two headers
 
@@ -165,7 +155,7 @@ The script `RUN_ME_FIRST.sh` talks to [https://accounts.google.com/o/oauth2/toke
 
 <div class="outline-4">
 
-#### Managing credentials
+### Managing credentials
 
 The script `RUN_ME_FIRST.sh` obtains `refresh_token`, `access_token`, and `expires_in` in exchange for the code pasted in Step 3 above. [This documentation](https://developers.google.com/accounts/docs/OAuth2#installed) includes a nice graphic to understand the flow. Function `ensure_fresh_access_token` in `common.sh` obtains a new `access_token` after the old one expires. A working `credentials.sh` file looks something like this:
 
