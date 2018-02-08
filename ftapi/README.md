@@ -31,7 +31,7 @@ OAuth credentials so that it can access Fusion Table data on your behalf.
     process it like so:
 
     <pre>cat $(ls -t ~/Downloads/client_secret*.json | head -1) \
-      | sed -e 's/[{},]/\n/g' -e 's/":"/=/g' -e 's/"//g' \
+      | sed -e $'s/[{},]/\\\n/g' -e 's/":"/=/g' -e 's/"//g' \
       | sed -e 's/client_id/CLIENT_ID/' -e 's/client_secret/CLIENT_SECRET/' \
       | grep CLIENT_ > credentials.sh
     </pre>
