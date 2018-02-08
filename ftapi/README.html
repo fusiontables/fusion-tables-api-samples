@@ -51,9 +51,9 @@ examples. The
 <a href="https://developers.google.com/fusiontables">developer website</a>
 has more details,
 <a href="https://developers.google.com/fusiontables/docs/sample_code">sample code</a>, and
-<a href="https://developers.google.com/fusiontables/docs/v1/libraries">client libraries</a>
+<a href="https://developers.google.com/fusiontables/docs/v2/libraries">client libraries</a>
 for specific programming languages. The
-<a href="https://developers.google.com/apis-explorer/#p/fusiontables/v1/">APIs Explorer</a>
+<a href="https://developers.google.com/apis-explorer/#p/fusiontables/v2/">APIs Explorer</a>
 site also provides an interactive web interface to test out calls to the API.
 </p>
 </div>
@@ -138,7 +138,7 @@ like
  "tableId": "1-Zrlr9Kle9ljjMl2WjqHfytRKqbVlN_r00ELHig",
 </pre>
 See
-<a href="https://developers.google.com/fusiontables/docs/v1/getting_started#background-operations">this mapping</a>
+<a href="https://developers.google.com/fusiontables/docs/v2/getting_started#background-operations">this mapping</a>
 of API operations to HTTP methods for more information.
 </p>
 <p>
@@ -240,10 +240,10 @@ The script <code>RUN_ME_FIRST.sh</code> talks to
 for an "installed application" that can access tables on your behalf. The
 script <code>ftsql.sh</code> is the simplest illustration of using the possibly
 refreshed access token. It uses curl to send a POST request to
-<a href="https://www.googleapis.com/fusiontables/v1/query?alt=csv">https://www.googleapis.com/fusiontables/v1/query?alt=csv</a>. Its invocation
+<a href="https://www.googleapis.com/fusiontables/v2/query?alt=csv">https://www.googleapis.com/fusiontables/v2/query?alt=csv</a>. Its invocation
 arguments become the value of the request parameter, <code>sql</code>. The script
 <code>ftapi.sh</code> uses curl to send requests to a URI under
-<a href="https://www.googleapis.com/fusiontables/v1">https://www.googleapis.com/fusiontables/v1</a>. The first argument is the
+<a href="https://www.googleapis.com/fusiontables/v2">https://www.googleapis.com/fusiontables/v2</a>. The first argument is the
 URI. Additional arguments are passed through to curl. The examples above use
 only <code>-d</code> and <code>-T</code> on the command line. Internally, the scripts also use <code>-H</code>
 to set the following two headers

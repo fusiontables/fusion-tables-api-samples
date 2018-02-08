@@ -12,4 +12,4 @@ ensure_fresh_access_token
 # API with option alt=csv, because the default (JSON) is harder to read for
 # humans.
 curl -s -S -d sql="$*" -H "Authorization: Bearer $access_token" \
-  "https://www.googleapis.com/fusiontables/v1/query?alt=csv"
+  "https://www.googleapis.com/fusiontables/v2/query?alt=csv"

@@ -17,4 +17,4 @@ ensure_fresh_access_token
 # argument.
 curl -s -S $* -H "Authorization: Bearer $access_token" \
   -H "Content-Type: application/json" \
-  "https://www.googleapis.com/fusiontables/v1/$uri"
+  "https://www.googleapis.com/fusiontables/v2/$uri"

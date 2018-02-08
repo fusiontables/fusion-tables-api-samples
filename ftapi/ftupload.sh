@@ -15,4 +15,4 @@ ensure_fresh_access_token
 # message body. Finally the upload URL with table ID from command line.
 curl -s -S --data-binary @- -H "Authorization: Bearer $access_token" \
   -H "Content-Type: application/octet-stream" \
-  "https://www.googleapis.com/upload/fusiontables/v1/tables/$1/import"
+  "https://www.googleapis.com/upload/fusiontables/v2/tables/$1/import"
