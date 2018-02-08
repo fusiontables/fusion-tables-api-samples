@@ -12,7 +12,7 @@ declare expires_at
 function browse() {
   case $(uname) in
     (Darwin) open $* ;;
-    (Linux) gnome-open $* ;;
+    (Linux) x-www-browser $* ;;
     (CYGWIN*) cygstart $* ;;
     (*) firefox $* ;;
   esac

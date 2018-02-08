@@ -27,7 +27,7 @@ One way to accomplish this, would be to click "Download JSON" on the page for
 the Native regsitered app. Then process the downloaded JSON:
 
 cat $(ls -t ~/Downloads/client_secret*.json | head -1) \
-  | sed -e 's/[{},]/\n/g' -e 's/":"/=/g' -e 's/"//g' \
+  | sed -e $'s/[{},]/\\\n/g' -e 's/":"/=/g' -e 's/"//g' \
   | sed -e 's/client_id/CLIENT_ID/' -e 's/client_secret/CLIENT_SECRET/' \
   | grep CLIENT_ > credentials.sh
 
